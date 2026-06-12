@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Dashboard</title>
+<link rel="stylesheet" href="style.css" onerror="setTimeout(() => { this.href = 'style.css?retry=' + Date.now(); }, 500)">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>🌟 Life Dashboard</h1>
+    <span class="date" id="today-date"></span>
+  </header>
+
+  <nav>
+    <button data-tab="dash" class="active">Overview</button>
+    <button data-tab="money">💵 Money</button>
+    <button data-tab="assets">📈 Assets</button>
+    <button data-tab="food">🍎 Food</button>
+    <button data-tab="goals">🎯 Goals</button>
+    <button data-tab="sync">☁ Sync</button>
+  </nav>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section class="tab active" id="tab-dash">
+    <div class="grid">
+      <div class="card">
+        <h3>Profit today</h3>
+        <div class="big" id="dash-money">$0.00</div>
+        <div class="sub" id="dash-money-sub">no trading entry yet</div>
+      </div>
+      <div class="card">
+        <h3>Portfolio value</h3>
+        <div class="big" id="dash-port">—</div>
+        <div class="sub" id="dash-port-day">no assets yet</div>
+      </div>
+      <div class="card">
+        <h3>Calories today</h3>
+        <div class="big" id="dash-cal">0</div>
+        <div class="sub" id="dash-cal-sub"></div>
+      </div>
+      <div class="card">
+        <h3>Goals</h3>
+        <div class="big" id="dash-goals">—</div>
+        <div class="sub" id="dash-goals-sub"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Goal progress</h2>
+      <div id="dash-goal-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ MONEY (daily SOL profit tracking) ============ -->
+  <section class="tab" id="tab-money">
+    <div class="grid">
+      <div class="card"><h3>Profit today</h3><div class="big" id="money-today">$0.00</div><div class="sub" id="money-today-sub">no entry yet</div></div>
+      <div class="card"><h3>Profit this month</h3><div class="big" id="money-month">$0.00</div><div class="sub" id="money-month-sub">0.00 SOL</div></div>
+      <div class="card"><h3>SOL price</h3><div class="big" id="sol-price">—</div><div class="sub" id="sol-price-sub">live from CoinGecko</div></div>
+    </div>
+
+    <div class="panel">
+      <h2>Log a trading day</h2>
+      <form class="row" id="trade-form">
+        <label class="field">Date
+          <input id="trade-date" type="date" required>
+        </label>
+        <label class="field">Starting SOL
+          <input id="trade-start" type="number" step="any" style="width:130px" required>
+        </label>
+        <label class="field">Ending SOL
+          <input id="trade-end" type="number" step="any" style="width:130px" required>
+        </label>
+        <button class="btn" type="submit">Log day</button>
+      </form>
+      <p class="muted" style="margin-top:8px">Profit = ending − starting. USD uses the live SOL price (like the SOL Price cell in your sheet). Logging the same date again overwrites that day.</p>
+    </div>
+
+    <div class="panel">
+      <h2>
+        <span class="month-nav">
+          <button class="btn small ghost" id="month-prev" type="button">◀</button>
+          <span id="month-label" style="min-width:140px;text-align:center;display:inline-block"></span>
+          <button class="btn small ghost" id="month-next" type="button">▶</button>
+        </span>
+        <span class="muted" id="month-totals"></span>
+      </h2>
+      <table>
+        <thead><tr><th>Day</th><th class="num">Starting SOL</th><th class="num">Ending SOL</th><th class="num">Profit (SOL)</th><th class="num">Profit (USD)</th><th></th></tr></thead>
+        <tbody id="trade-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>SOL swaps</h2>
+      <form class="row" id="swap-form">
+        <label class="field">Date
+          <input id="swap-date" type="date">
+        </label>
+        <label class="field"># SOL
+          <input id="swap-sol" type="number" step="any" min="0" style="width:120px" required>
+        </label>
+        <label class="field">$ total
+          <input id="swap-usd" type="number" step="any" min="0" style="width:120px" required>
+        </label>
+        <button class="btn" type="submit">Add swap</button>
+      </form>
+      <table>
+        <thead><tr><th>Date</th><th class="num"># SOL</th><th class="num">$ total</th><th class="num">$ / SOL</th><th></th></tr></thead>
+        <tbody id="swap-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h2>Goals</h2>
+      <div id="money-goal-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ ASSETS ============ -->
+  <section class="tab" id="tab-assets">
+    <div class="grid">
+      <div class="card"><h3>Total value</h3><div class="big" id="port-value">—</div></div>
+      <div class="card"><h3>Today's change</h3><div class="big" id="port-day">—</div></div>
+      <div class="card"><h3>Total gain / loss</h3><div class="big" id="port-gain">—</div><div class="sub" id="port-gain-sub">vs what you paid</div></div>
+    </div>
+    <div class="panel">
+      <h2>
+        <span>Holdings</span>
+        <button class="btn small ghost" id="refresh-btn" type="button">↻ Refresh prices</button>
+      </h2>
+      <form class="row" id="asset-form">
+        <label class="field">Type
+          <select id="asset-kind">
+            <option value="crypto">Crypto</option>
+            <option value="stock">Stock / ETF</option>
+          </select>
+        </label>
+        <label class="field">Symbol
+          <input id="asset-symbol" placeholder="BTC, ETH, AAPL…" style="width:110px" required>
+        </label>
+        <label class="field">Quantity (0 = just watch)
+          <input id="asset-qty" type="number" step="any" min="0" style="width:140px" required>
+        </label>
+        <label class="field">Avg buy price ($)
+          <input id="asset-buy" type="number" step="any" min="0" style="width:130px" placeholder="0">
+        </label>
+        <button class="btn" type="submit">Add asset</button>
+      </form>
+      <div class="statusmsg" id="asset-status" style="margin-top:8px"></div>
+      <table>
+        <thead><tr>
+          <th>Asset</th><th class="num">Qty</th><th class="num">Buy price</th><th class="num">Price now</th>
+          <th class="num">24h</th><th class="num">Value</th><th class="num">Gain / loss</th><th></th>
+        </tr></thead>
+        <tbody id="asset-rows"></tbody>
+      </table>
+      <p class="muted" style="margin-top:10px">Crypto prices come from CoinGecko; stock prices from Yahoo Finance. Prices auto-refresh every 10 minutes while the app is open. Quantity 0 adds a watch-only row (live price, no portfolio impact). Use ✎ on a row to set a price manually if a lookup fails.</p>
+    </div>
+  </section>
+
+  <!-- ============ FOOD ============ -->
+  <section class="tab" id="tab-food">
+    <div class="grid">
+      <div class="card"><h3>Calories today</h3><div class="big" id="food-total">0</div></div>
+      <div class="card"><h3>Remaining</h3><div class="big" id="food-remaining">2,000 left</div></div>
+      <div class="card"><h3>Daily goal</h3>
+        <input id="cal-goal" type="number" min="1" step="50" style="width:110px;font-size:18px;font-weight:700">
+        <div class="sub">calories per day</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Log food</h2>
+      <form class="row" id="food-form" autocomplete="off">
+        <div class="search-wrap">
+          <label class="field">Food (type to search)
+            <input id="food-search" placeholder="e.g. chicken, pizza, banana…" required>
+          </label>
+          <div class="search-results" id="food-results"></div>
+        </div>
+        <label class="field">Servings
+          <input id="food-servings" type="number" step="any" min="0.1" value="1" style="width:90px">
+        </label>
+        <label class="field">Cal / serving
+          <input id="food-kcal" type="number" step="1" min="0" style="width:110px" placeholder="auto" required>
+        </label>
+        <button class="btn" type="submit">Log it</button>
+      </form>
+      <table>
+        <thead><tr><th>Food</th><th class="num">Calories</th><th></th></tr></thead>
+        <tbody id="food-rows"></tbody>
+      </table>
+    </div>
+    <div class="panel">
+      <h2>Last 7 days</h2>
+      <table><tbody id="food-history"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ============ GOALS ============ -->
+  <section class="tab" id="tab-goals">
+    <div class="panel">
+      <h2>Add a goal</h2>
+      <form class="row" id="goal-form">
+        <label class="field" style="flex:1;min-width:180px">Goal
+          <input id="goal-title" placeholder="e.g. Save for a car, Lose 10 lbs…" required>
+        </label>
+        <label class="field">Target
+          <input id="goal-target" type="number" step="any" min="0.1" style="width:110px" required>
+        </label>
+        <label class="field">Starting at
+          <input id="goal-current" type="number" step="any" placeholder="0" style="width:110px">
+        </label>
+        <label class="field">Unit
+          <input id="goal-unit" placeholder="$, lbs, miles…" style="width:100px">
+        </label>
+        <button class="btn" type="submit">Add goal</button>
+      </form>
+    </div>
+    <div class="panel">
+      <h2>Your goals</h2>
+      <div id="goal-list"></div>
+    </div>
+  </section>
+  <!-- ============ SYNC ============ -->
+  <section class="tab" id="tab-sync">
+    <div class="panel">
+      <h2>☁ Cloud sync <span class="muted" id="sync-indicator"></span></h2>
+      <div id="sync-setup">
+        <p class="muted" style="margin-bottom:12px">
+          Sync saves your data to a <strong>private Gist</strong> in your own GitHub account, so your PC and
+          phone always see the same numbers. To connect:
+        </p>
+        <ol class="muted" style="margin:0 0 14px 20px; line-height:1.8">
+          <li>Open <a href="https://github.com/settings/tokens/new?scopes=gist&description=Life%20Dashboard%20Sync" target="_blank" style="color:var(--accent)">github.com/settings/tokens/new</a> (pre-filled with the right settings)</li>
+          <li>Set expiration to <strong>No expiration</strong>, scroll down, click <strong>Generate token</strong></li>
+          <li>Copy the token (starts with <code>ghp_</code>) and paste it below</li>
+        </ol>
+        <div class="row">
+          <label class="field" style="flex:1;min-width:240px">GitHub token
+            <input id="sync-token" type="password" placeholder="ghp_…">
+          </label>
+          <button class="btn" id="sync-connect-btn" type="button">Connect</button>
+        </div>
+        <p class="muted" style="margin-top:10px">Paste the same token on your phone (open this site → Sync tab) to link it. The token only has permission to read/write gists — nothing else in your account.</p>
+      </div>
+      <div id="sync-connected" style="display:none">
+        <p class="muted" style="margin-bottom:12px">Connected. Changes save to the cloud automatically a moment after you log them, and the app checks for updates from your other devices every few minutes.</p>
+        <div class="row">
+          <button class="btn small ghost" id="sync-pull-btn" type="button">⬇ Pull latest now</button>
+          <button class="btn small ghost" id="sync-disconnect-btn" type="button">Disconnect this device</button>
+        </div>
+      </div>
+      <p class="statusmsg" id="sync-status" style="margin-top:12px"></p>
+    </div>
+
+    <div class="panel">
+      <h2>Backup file</h2>
+      <p class="muted" style="margin-bottom:12px">Belt and suspenders: download all your data as a file, or restore from one.</p>
+      <div class="row">
+        <button class="btn small ghost" id="export-btn" type="button">⬇ Export backup</button>
+        <label class="btn small ghost" style="cursor:pointer">⬆ Import backup
+          <input id="import-file" type="file" accept=".json" style="display:none">
+        </label>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="foods.js"></script>
+<script src="app.js"></script>
+<script src="sync.js"></script>
+</body>
+</html>

@@ -424,6 +424,8 @@ tr.totals td { font-weight: 700; border-top: 2px solid var(--border); border-bot
 
 .bar.full > span { background: var(--green); }
 
+.bar.mini { height: 6px; margin: 6px 0 0; }
+
 .goal-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; align-items: center; }
 .goal-actions input { width: 110px; padding: 6px 10px; font-size: 13px; }
 

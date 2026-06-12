@@ -43,6 +43,52 @@ let viewMonth = todayStr().slice(0, 7); // which month the daily log table shows
 const tradeProfit = t => t.endSol - t.startSol;
 const fmtSol = n => (n >= 0 ? "+" : "") + n.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL";
 
+/* --- historical SOL prices: each day's profit is valued at that day's close --- */
+let solHist = store.load("life.solHist", {}); // "YYYY-MM-DD" -> USD close price
+let solHistBusy = false;
+const solHistAttempted = new Set();
+
+function histSolPrice(date) {
+  if (date === todayStr()) { const sp = solPriceInfo(); if (sp) return sp.price; }
+  return solHist[date] ?? solPriceInfo()?.price ?? null;
+}
+
+const usdForTrade = t => {
+  const p = histSolPrice(t.date);
+  return p != null ? tradeProfit(t) * p : null;
+};
+
+async function ensureSolHistory() {
+  if (solHistBusy) return;
+  const missing = [...new Set(trades.map(t => t.date))]
+    .filter(d => d < todayStr() && !(d in solHist) && !solHistAttempted.has(d))
+    .sort();
+  if (!missing.length) return;
+  solHistBusy = true;
+  missing.forEach(d => solHistAttempted.add(d));
+  try {
+    // Coinbase daily candles, max ~300 per request
+    let from = new Date(missing[0] + "T00:00:00Z");
+    const end = new Date(missing[missing.length - 1] + "T00:00:00Z");
+    let got = false;
+    while (from <= end) {
+      const to = new Date(Math.min(from.getTime() + 299 * 86400e3, end.getTime() + 86400e3));
+      const res = await fetch(`https://api.exchange.coinbase.com/products/SOL-USD/candles?granularity=86400&start=${from.toISOString()}&end=${to.toISOString()}`);
+      if (!res.ok) throw new Error("history " + res.status);
+      for (const c of await res.json()) {
+        solHist[new Date(c[0] * 1000).toISOString().slice(0, 10)] = c[4]; // close
+        got = true;
+      }
+      from = new Date(to.getTime());
+    }
+    if (got) {
+      store.save("life.solHist", solHist);
+      renderMoney(); renderDashboard();
+    }
+  } catch {} // fall back to live price for unpriced days
+  solHistBusy = false;
+}
+
 function solPriceInfo() {
   const c = priceCache["cg:solana"];
   return c && isFinite(c.price) ? c : null;
@@ -78,6 +124,7 @@ document.getElementById("trade-form").addEventListener("submit", e => {
   e.target.reset();
   document.getElementById("trade-date").value = todayStr();
   renderMoney(); renderDashboard();
+  ensureSolHistory(); // back-dated entries need that day's price
 });
 
 document.getElementById("month-prev").addEventListener("click", () => shiftMonth(-1));
@@ -101,10 +148,15 @@ document.getElementById("swap-form").addEventListener("submit", e => {
   renderMoney();
 });
 
-function monthTotals(monthPrefix, price) {
+function monthTotals(monthPrefix) {
   const list = trades.filter(t => t.date.startsWith(monthPrefix));
   const sol = list.reduce((s, t) => s + tradeProfit(t), 0);
-  return { sol, usd: price != null ? sol * price : null, days: list.length };
+  let usd = null;
+  for (const t of list) {
+    const u = usdForTrade(t); // valued at that day's SOL price
+    if (u != null) usd = (usd ?? 0) + u;
+  }
+  return { sol, usd, days: list.length };
 }
 
 function renderMoney() {
@@ -126,7 +178,7 @@ function renderMoney() {
     todaySub.textContent = "no entry yet — log today below";
   }
 
-  const mt = monthTotals(t.slice(0, 7), price);
+  const mt = monthTotals(t.slice(0, 7));
   const monthEl = document.getElementById("money-month");
   monthEl.textContent = mt.usd != null ? fmtMoney(mt.usd) : "—";
   monthEl.className = "big " + (mt.sol > 0 ? "up" : mt.sol < 0 ? "down" : "");
@@ -144,7 +196,7 @@ function renderMoney() {
   const [vy, vm] = viewMonth.split("-").map(Number);
   document.getElementById("month-label").textContent =
     new Date(vy, vm - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
-  const vt = monthTotals(viewMonth, price);
+  const vt = monthTotals(viewMonth);
   document.getElementById("month-totals").textContent = vt.days
     ? `month total: ${fmtSol(vt.sol)}${vt.usd != null ? " · " + fmtMoney(vt.usd) : ""}` : "";
 
@@ -153,13 +205,18 @@ function renderMoney() {
   tbody.innerHTML = rows.length ? rows.map(x => {
     const pSol = tradeProfit(x);
     const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
+    const dayPrice = histSolPrice(x.date);
+    const usd = usdForTrade(x);
+    const priceNote = dayPrice != null
+      ? (x.date === todayStr() || solHist[x.date] == null ? `live price ${fmtPrice(dayPrice)}` : `SOL ${fmtPrice(dayPrice)} on ${x.date}`)
+      : "";
     return `
     <tr>
       <td>${esc(x.date)}</td>
       <td class="num">${x.startSol}</td>
       <td class="num">${x.endSol}</td>
       <td class="num ${cls}">${fmtSol(pSol)}</td>
-      <td class="num ${cls}">${price != null ? fmtMoney(pSol * price) : "—"}</td>
+      <td class="num ${cls}" title="${priceNote}">${usd != null ? fmtMoney(usd) : "—"}</td>
       <td class="num"><button class="del" data-id="${x.id}" title="Delete">✕</button></td>
     </tr>`;
   }).join("") + (rows.length > 1 ? `
@@ -593,6 +650,7 @@ document.getElementById("today-date").textContent = new Date().toLocaleDateStrin
 document.getElementById("trade-date").value = todayStr();
 document.getElementById("swap-date").value = todayStr();
 ensureSolPrice();
+ensureSolHistory();
 renderMoney();
 renderAssets();
 renderFood();

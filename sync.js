@@ -46,6 +46,7 @@ function applyRemote(envelope) {
   goals = store.load("life.goals", []);
   settings = store.load("life.settings", { calGoal: 2000 });
   renderMoney(); renderAssets(); renderFood(); renderGoals(); renderDashboard();
+  ensureSolHistory(); // imported/synced trades may need historical prices
 }
 
 async function gistPull() {

@@ -345,6 +345,17 @@ label.check .kcal { margin-left: auto; color: var(--muted); font-size: 12px; whi
 td.p-pos { color: var(--green); background: rgba(52, 211, 153, .08); font-weight: 600; }
 td.p-neg { color: var(--red); background: rgba(248, 113, 113, .08); font-weight: 600; }
 tr.totals td { font-weight: 700; border-top: 2px solid var(--border); border-bottom: none; }
+
+tr.note-row td {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+  padding-top: 2px;
+  background: rgba(79, 140, 255, .04);
+}
+
+.note-btn.has-note { color: var(--amber); }
+.note-btn:hover { color: var(--accent); background: rgba(79, 140, 255, .1); }
 .month-nav { display: inline-flex; align-items: center; gap: 6px; }
 
 .empty {

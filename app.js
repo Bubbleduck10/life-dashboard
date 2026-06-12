@@ -237,8 +237,12 @@ function renderMoney() {
       <td class="num">${x.endSol}</td>
       <td class="num ${cls}">${fmtSol(pSol)}</td>
       <td class="num ${cls}" title="${priceNote}">${usd != null ? fmtMoney(usd) : "—"}</td>
-      <td class="num"><button class="del" data-id="${x.id}" title="Delete">✕</button></td>
-    </tr>`;
+      <td class="num" style="white-space:nowrap">
+        <button class="del note-btn ${x.note ? "has-note" : ""}" data-act="note" data-id="${x.id}" title="${x.note ? "Edit note" : "Add note"}">✎</button>
+        <button class="del" data-act="del" data-id="${x.id}" title="Delete">✕</button>
+      </td>
+    </tr>
+    ${x.note ? `<tr class="note-row"><td colspan="6">📝 ${esc(x.note)}</td></tr>` : ""}`;
   }).join("") + (rows.length > 1 ? `
     <tr class="totals">
       <td colspan="3">Month total</td>
@@ -248,8 +252,18 @@ function renderMoney() {
     </tr>` : "")
     : `<tr><td colspan="6" class="empty">No trading days logged for this month.</td></tr>`;
   tbody.querySelectorAll(".del").forEach(b => b.addEventListener("click", () => {
-    trades = trades.filter(x => x.id !== b.dataset.id);
-    store.save("life.trades", trades);
+    const tr = trades.find(x => x.id === b.dataset.id);
+    if (!tr) return;
+    if (b.dataset.act === "note") {
+      const input = prompt(`Note for ${tr.date}:`, tr.note || "");
+      if (input === null) return;
+      if (input.trim()) tr.note = input.trim(); else delete tr.note;
+      store.save("life.trades", trades);
+    } else {
+      if (!confirm(`Delete the entry for ${tr.date}?`)) return;
+      trades = trades.filter(x => x.id !== tr.id);
+      store.save("life.trades", trades);
+    }
     renderMoney(); renderDashboard();
   }));
 

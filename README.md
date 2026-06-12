@@ -1,20 +1,22 @@
 # 🌟 Life Dashboard
 
-Your all-in-one tracker for money, assets, food, and goals. Everything runs
-locally in your browser — no accounts, no servers, your data never leaves
-your PC.
+Your all-in-one tracker for money, assets, food, and goals.
 
-## How to open it
+**Live app: https://bubbleduck10.github.io/life-dashboard/**
 
-Double-click **`Life Dashboard.bat`** (or open `index.html` directly in your
-browser). Bookmark it or pin it to your taskbar for quick access.
+Open that URL on any device (bookmark it / add to your phone's home screen).
+You can also run it locally by double-clicking `Life Dashboard.bat`.
+
+Data is stored per-device, and the ☁ Sync tab links your devices together
+through a private GitHub Gist so they all see the same numbers.
 
 ## What's inside
 
 - **Overview** — one screen with today's net income, portfolio value and
   today's change, calories eaten vs your goal, and all goal progress bars.
-- **💵 Money** — log income and expenses; see today / this week / this month
-  net totals.
+- **💵 Money** — daily SOL trading log: starting/ending balance per day,
+  profit in SOL and USD at the live price, monthly totals, and a swap log
+  with average price.
 - **📈 Assets** — add crypto or stock holdings (symbol, quantity, what you
   paid). Live prices come from CoinGecko (crypto) and Yahoo Finance (stocks),
   with 24h up/down and total gain/loss. Use the ✎ button on a row to set a

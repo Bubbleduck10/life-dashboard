@@ -671,18 +671,17 @@ function renderDashboard() {
   renderGoalList(document.getElementById("dash-goal-list"), false);
   renderGoalList(document.getElementById("money-goal-list"), true);
 
-  // daily profits: last 7 logged trading days
-  const recent = [...trades].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7);
-  document.getElementById("dash-profit-rows").innerHTML = recent.length ? recent.map(x => {
-    const pSol = tradeProfit(x);
-    const usd = usdForTrade(x);
+  // daily profits: today's entry only
+  document.getElementById("dash-profit-rows").innerHTML = todayTrade ? (() => {
+    const pSol = tradeProfit(todayTrade);
+    const usd = usdForTrade(todayTrade);
     const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
     return `<tr>
-      <td>${x.date === t ? "Today" : esc(x.date)}</td>
+      <td>Today <span class="muted">(${todayTrade.startSol} → ${todayTrade.endSol})</span></td>
       <td class="num ${cls}">${fmtSol(pSol)}</td>
       <td class="num ${cls}">${usd != null ? fmtMoney(usd) : "—"}</td>
     </tr>`;
-  }).join("") : `<tr><td colspan="3" class="empty">No trading days logged yet.</td></tr>`;
+  })() : `<tr><td colspan="3" class="empty">No entry for today yet — log it on the Money tab.</td></tr>`;
 
   // daily food progress
   const todaysFood = food.filter(f => f.date === t);

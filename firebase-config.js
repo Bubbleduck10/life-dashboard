@@ -19,4 +19,11 @@
 //   5. Project settings → Your apps → Web app (</>) → copy the firebaseConfig
 //      object and assign it below.
 
-window.FIREBASE_CONFIG = null; // paste the firebaseConfig object here
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBPHCNKa5Z3AuOsx1sm1tqRH0YQKYAjZcw",
+  authDomain: "life-dashboard-cfcd6.firebaseapp.com",
+  projectId: "life-dashboard-cfcd6",
+  storageBucket: "life-dashboard-cfcd6.firebasestorage.app",
+  messagingSenderId: "446833678045",
+  appId: "1:446833678045:web:fcf8c813b938a436042d34",
+};

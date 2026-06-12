@@ -223,9 +223,38 @@
         <label class="field">Restaurant
           <select id="mb-restaurant"></select>
         </label>
+        <button class="btn small ghost" id="mb-add-btn" type="button">+ Add restaurant</button>
+        <button class="btn small ghost" id="mb-remove-btn" type="button" title="Remove this restaurant from your list">−&nbsp;Remove</button>
         <div id="mb-formats" class="check-grid" style="flex:1"></div>
       </div>
+
+      <div id="mb-add-panel" style="display:none;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px">
+        <div class="builder-group" style="margin-top:0">
+          <div class="gname">Popular restaurants — click one to add it (menu included)</div>
+          <div class="check-grid" id="mb-library"></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <label class="field" style="flex:1;min-width:180px">Or create your own (you build the menu)
+            <input id="mb-new-name" placeholder="e.g. Tony's Diner">
+          </label>
+          <button class="btn small" id="mb-create-btn" type="button">Create</button>
+        </div>
+      </div>
+
       <div id="mb-groups"></div>
+
+      <div id="mb-editor" class="row" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+        <label class="field">Category
+          <input id="mb-item-group" placeholder="e.g. Mains" style="width:120px">
+        </label>
+        <label class="field" style="flex:1;min-width:140px">Menu item
+          <input id="mb-item-name" placeholder="e.g. Carne asada plate">
+        </label>
+        <label class="field">Calories
+          <input id="mb-item-kcal" type="number" min="0" step="5" style="width:100px">
+        </label>
+        <button class="btn small" id="mb-item-add" type="button">Add to menu</button>
+      </div>
       <div class="row" style="margin-top:14px;align-items:center">
         <button class="btn" id="mb-log" type="button">Log meal — 0 cal</button>
         <button class="btn small ghost" id="mb-clear" type="button">Clear</button>

@@ -524,12 +524,95 @@ document.getElementById("food-form").addEventListener("submit", e => {
 
 /* ----- "Eating out" meal builder ----- */
 const mbRestaurant = document.getElementById("mb-restaurant");
-mbRestaurant.innerHTML = Object.keys(MEAL_BUILDER).map(r => `<option>${esc(r)}</option>`).join("");
+let restState = store.load("life.restaurants", { enabled: ["Chipotle", "Subway"], custom: {} });
 
-function mbConfig() { return MEAL_BUILDER[mbRestaurant.value]; }
+function mbConfig() { return restState.custom[mbRestaurant.value] || MEAL_BUILDER[mbRestaurant.value]; }
+
+function renderRestaurantSelect(selectName) {
+  const names = restState.enabled.filter(n => MEAL_BUILDER[n] || restState.custom[n]);
+  mbRestaurant.innerHTML = names.map(r => `<option>${esc(r)}</option>`).join("");
+  if (selectName && names.includes(selectName)) mbRestaurant.value = selectName;
+  renderBuilder();
+}
+
+function renderLibrary() {
+  const available = Object.keys(MEAL_BUILDER).filter(n => !restState.enabled.includes(n));
+  document.getElementById("mb-library").innerHTML = available.length
+    ? available.map(n => `<label class="check" data-lib="${esc(n)}" style="justify-content:center">${esc(n)}</label>`).join("")
+    : `<span class="muted">All built-in restaurants are already on your list.</span>`;
+  document.querySelectorAll("#mb-library [data-lib]").forEach(el => el.addEventListener("click", () => {
+    restState.enabled.push(el.dataset.lib);
+    store.save("life.restaurants", restState);
+    document.getElementById("mb-add-panel").style.display = "none";
+    renderRestaurantSelect(el.dataset.lib);
+  }));
+}
+
+document.getElementById("mb-add-btn").addEventListener("click", () => {
+  const panel = document.getElementById("mb-add-panel");
+  panel.style.display = panel.style.display === "none" ? "" : "none";
+  renderLibrary();
+});
+
+document.getElementById("mb-create-btn").addEventListener("click", () => {
+  const name = document.getElementById("mb-new-name").value.trim();
+  if (!name) return;
+  if (MEAL_BUILDER[name] || restState.custom[name]) { alert("That restaurant already exists."); return; }
+  restState.custom[name] = { formats: [{ name: "Order", kcal: 0, mult: 1 }], groups: [], custom: true };
+  restState.enabled.push(name);
+  store.save("life.restaurants", restState);
+  document.getElementById("mb-new-name").value = "";
+  document.getElementById("mb-add-panel").style.display = "none";
+  renderRestaurantSelect(name);
+});
+
+document.getElementById("mb-remove-btn").addEventListener("click", () => {
+  const name = mbRestaurant.value;
+  if (!name) return;
+  const isCustom = !!restState.custom[name];
+  if (!confirm(isCustom
+    ? `Delete "${name}" and its menu? (Meals already logged stay in your history.)`
+    : `Remove "${name}" from your list? You can re-add it anytime from the library.`)) return;
+  restState.enabled = restState.enabled.filter(n => n !== name);
+  delete restState.custom[name];
+  store.save("life.restaurants", restState);
+  renderRestaurantSelect();
+});
+
+document.getElementById("mb-item-add").addEventListener("click", () => {
+  const conf = mbConfig();
+  if (!conf || !conf.custom) return;
+  const gName = document.getElementById("mb-item-group").value.trim() || "Menu";
+  const iName = document.getElementById("mb-item-name").value.trim();
+  const kcal = parseInt(document.getElementById("mb-item-kcal").value);
+  if (!iName || !isFinite(kcal) || kcal < 0) return;
+  let group = conf.groups.find(g => g.name.toLowerCase() === gName.toLowerCase());
+  if (!group) { group = { name: gName, items: [] }; conf.groups.push(group); }
+  group.items.push({ name: iName, kcal });
+  store.save("life.restaurants", restState);
+  document.getElementById("mb-item-name").value = "";
+  document.getElementById("mb-item-kcal").value = "";
+  renderBuilder();
+  document.getElementById("mb-item-name").focus();
+});
 
 function renderBuilder() {
   const conf = mbConfig();
+  const editor = document.getElementById("mb-editor");
+  if (!conf) {
+    document.getElementById("mb-formats").innerHTML = "";
+    document.getElementById("mb-groups").innerHTML = `<div class="empty">No restaurants on your list — click "+ Add restaurant".</div>`;
+    document.getElementById("mb-log").textContent = "Log meal — 0 cal";
+    editor.style.display = "none";
+    return;
+  }
+  editor.style.display = conf.custom ? "" : "none";
+  if (conf.custom && !conf.groups.length) {
+    document.getElementById("mb-formats").innerHTML = "";
+    document.getElementById("mb-groups").innerHTML = `<div class="empty">No menu yet — add this restaurant's items below (grab calories from their menu or site).</div>`;
+    document.getElementById("mb-log").textContent = "Log meal — 0 cal";
+    return;
+  }
   document.getElementById("mb-formats").innerHTML = conf.formats.map((f, i) => `
     <label class="check"><input type="radio" name="mb-format" value="${i}" ${i === 0 ? "checked" : ""}>
       ${esc(f.name)}<span class="kcal">${f.kcal ? "+" + f.kcal : f.mult > 1 ? "×" + f.mult : ""}</span>
@@ -539,17 +622,27 @@ function renderBuilder() {
       <div class="gname">${esc(g.name)}</div>
       <div class="check-grid">${g.items.map((it, ii) => `
         <label class="check"><input type="checkbox" data-g="${gi}" data-i="${ii}">
-          ${esc(it.name)}<span class="kcal">${it.kcal} cal</span>
+          ${esc(it.name)}<span class="kcal">${it.kcal} cal</span>${conf.custom ? `<button class="del mb-item-del" data-g="${gi}" data-i="${ii}" title="Remove from menu">✕</button>` : ""}
         </label>`).join("")}</div>
     </div>`).join("");
   document.querySelectorAll("#mb-formats input, #mb-groups input").forEach(el =>
     el.addEventListener("change", updateBuilderTotal));
+  document.querySelectorAll(".mb-item-del").forEach(btn => btn.addEventListener("click", e => {
+    e.preventDefault(); e.stopPropagation();
+    const conf2 = mbConfig();
+    conf2.groups[+btn.dataset.g].items.splice(+btn.dataset.i, 1);
+    conf2.groups = conf2.groups.filter(g => g.items.length);
+    store.save("life.restaurants", restState);
+    renderBuilder();
+  }));
   updateBuilderTotal();
 }
 
 function builderSelection() {
   const conf = mbConfig();
-  const fmt = conf.formats[+document.querySelector('input[name="mb-format"]:checked').value];
+  const fmtInput = document.querySelector('input[name="mb-format"]:checked');
+  if (!conf || !fmtInput) return { fmt: null, picked: [], total: 0 };
+  const fmt = conf.formats[+fmtInput.value];
   const picked = [...document.querySelectorAll("#mb-groups input:checked")]
     .map(el => conf.groups[+el.dataset.g].items[+el.dataset.i]);
   const total = Math.round(fmt.kcal + fmt.mult * picked.reduce((s, it) => s + it.kcal, 0));
@@ -566,14 +659,15 @@ document.getElementById("mb-clear").addEventListener("click", renderBuilder);
 document.getElementById("mb-log").addEventListener("click", () => {
   const { fmt, picked, total } = builderSelection();
   if (!picked.length) return;
-  const name = `${mbRestaurant.value} ${fmt.name.split(" (")[0]} — ${picked.map(p => p.name.toLowerCase()).join(", ")}`;
+  const fmtLabel = fmt.name === "Order" ? "" : " " + fmt.name.split(" (")[0];
+  const name = `${mbRestaurant.value}${fmtLabel} — ${picked.map(p => p.name.toLowerCase()).join(", ")}`;
   food.push({ id: uid(), date: todayStr(), name, kcal: total, servings: 1 });
   store.save("life.food", food);
   renderBuilder();
   renderFood(); renderDashboard();
 });
 
-renderBuilder();
+renderRestaurantSelect();
 
 document.getElementById("cal-goal").addEventListener("change", e => {
   const v = parseInt(e.target.value);

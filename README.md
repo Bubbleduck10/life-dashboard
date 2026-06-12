@@ -2,11 +2,15 @@
 
 Your all-in-one tracker for money, assets, food, and goals.
 
-**▶ Try it here: https://bubbleduck10.github.io/life-dashboard/?demo**
+**▶ Use the app: https://bubbleduck10.github.io/life-dashboard/**
 
-Everything runs in your browser — no accounts, no servers, your data never
-leaves your device. The ☁ Sync tab can optionally link your devices together
-through your own private GitHub Gist so they all see the same numbers.
+**👀 Or try the demo first (sandbox, nothing saved): https://bubbleduck10.github.io/life-dashboard/?demo**
+
+Everything runs in your browser — no accounts, no servers, and your data is
+yours alone: it's stored on your own device and never leaves it. Each person
+who uses the app gets their own private copy. The ☁ Sync tab can optionally
+link your devices together through your own private GitHub Gist so they all
+see the same numbers.
 
 ## What's inside
 

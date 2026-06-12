@@ -301,7 +301,8 @@ function renderMoney() {
       <td class="num ${cls}">${fmtAmt(pSol, coin)}</td>
       <td class="num ${cls}" title="${priceNote}">${usd != null ? fmtMoney(usd) : "—"}</td>
       <td class="num" style="white-space:nowrap">
-        <button class="del note-btn ${x.note ? "has-note" : ""}" data-act="note" data-id="${x.id}" title="${x.note ? "Edit note" : "Add note"}">✎</button>
+        <button class="del" data-act="end" data-id="${x.id}" title="Update ending balance (day not done yet?)">✎</button>
+        <button class="del note-btn ${x.note ? "has-note" : ""}" data-act="note" data-id="${x.id}" title="${x.note ? "Edit note" : "Add note"}">📝</button>
         <button class="del" data-act="del" data-id="${x.id}" title="Delete">✕</button>
       </td>
     </tr>
@@ -317,7 +318,14 @@ function renderMoney() {
   tbody.querySelectorAll(".del").forEach(b => b.addEventListener("click", () => {
     const tr = trades.find(x => x.id === b.dataset.id);
     if (!tr) return;
-    if (b.dataset.act === "note") {
+    if (b.dataset.act === "end") {
+      const input = prompt(`Ending balance for ${tr.date} (${tradeCoin(tr)}) — update anytime, the day doesn't have to be over:`, tr.endSol);
+      if (input === null) return;
+      const v = parseFloat(input);
+      if (!isFinite(v)) return;
+      tr.endSol = v;
+      store.save("life.trades", trades);
+    } else if (b.dataset.act === "note") {
       const input = prompt(`Note for ${tr.date}:`, tr.note || "");
       if (input === null) return;
       if (input.trim()) tr.note = input.trim(); else delete tr.note;

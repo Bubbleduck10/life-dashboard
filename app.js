@@ -145,6 +145,8 @@ document.getElementById("swap-form").addEventListener("submit", e => {
   swaps.push({ id: uid(), date, sol, usd });
   store.save("life.swaps", swaps);
   e.target.reset();
+  document.getElementById("swap-date").value = todayStr();
+  viewMonth = date.slice(0, 7); // show the month the swap landed in
   renderMoney();
 });
 
@@ -197,8 +199,16 @@ function renderMoney() {
   document.getElementById("month-label").textContent =
     new Date(vy, vm - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
   const vt = monthTotals(viewMonth);
-  document.getElementById("month-totals").textContent = vt.days
+  const totEl = document.getElementById("month-totals");
+  totEl.textContent = vt.days
     ? `month total: ${fmtSol(vt.sol)}${vt.usd != null ? " · " + fmtMoney(vt.usd) : ""}` : "";
+  totEl.className = vt.sol > 0 ? "up" : vt.sol < 0 ? "down" : "muted";
+
+  const monthSwaps = swaps.filter(x => x.date.startsWith(viewMonth));
+  const msSol = monthSwaps.reduce((s, x) => s + x.sol, 0);
+  const msUsd = monthSwaps.reduce((s, x) => s + x.usd, 0);
+  document.getElementById("month-swapped").textContent = monthSwaps.length
+    ? `swapped: ${msSol.toLocaleString(undefined, { maximumFractionDigits: 2 })} SOL ↔ ${fmtMoney(msUsd)}` : "";
 
   const rows = trades.filter(x => x.date.startsWith(viewMonth)).sort((a, b) => b.date.localeCompare(a.date));
   const tbody = document.getElementById("trade-rows");
@@ -233,26 +243,31 @@ function renderMoney() {
     renderMoney(); renderDashboard();
   }));
 
-  // --- swaps ---
-  const stbody = document.getElementById("swap-rows");
+  // --- swaps (only the viewed month) ---
+  const monthName = new Date(vy, vm - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  document.getElementById("swap-month-label").textContent = "· " + monthName;
   const totSol = swaps.reduce((s, x) => s + x.sol, 0);
   const totUsd = swaps.reduce((s, x) => s + x.usd, 0);
-  stbody.innerHTML = swaps.length ? [...swaps].sort((a, b) => b.date.localeCompare(a.date)).map(x => `
+  document.getElementById("swap-alltime").textContent = swaps.length
+    ? `all-time: ${totSol.toLocaleString(undefined, { maximumFractionDigits: 2 })} SOL ↔ ${fmtMoney(totUsd)} · avg ${fmtPrice(totUsd / totSol)}` : "";
+
+  const stbody = document.getElementById("swap-rows");
+  stbody.innerHTML = monthSwaps.length ? [...monthSwaps].sort((a, b) => b.date.localeCompare(a.date)).map(x => `
     <tr>
       <td>${esc(x.date)}</td>
       <td class="num">${x.sol}</td>
       <td class="num">${fmtMoney(x.usd)}</td>
       <td class="num">${fmtPrice(x.usd / x.sol)}</td>
       <td class="num"><button class="del" data-id="${x.id}" title="Delete">✕</button></td>
-    </tr>`).join("") + `
+    </tr>`).join("") + (monthSwaps.length > 1 ? `
     <tr class="totals">
-      <td>Total</td>
-      <td class="num">${totSol.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
-      <td class="num">${fmtMoney(totUsd)}</td>
-      <td class="num">avg ${fmtPrice(totUsd / totSol)}</td>
+      <td>Month total</td>
+      <td class="num">${msSol.toLocaleString(undefined, { maximumFractionDigits: 2 })}</td>
+      <td class="num">${fmtMoney(msUsd)}</td>
+      <td class="num">avg ${fmtPrice(msUsd / msSol)}</td>
       <td></td>
-    </tr>`
-    : `<tr><td colspan="5" class="empty">No swaps logged — track SOL you bought or sold here.</td></tr>`;
+    </tr>` : "")
+    : `<tr><td colspan="5" class="empty">No swaps in ${monthName}.</td></tr>`;
   stbody.querySelectorAll(".del").forEach(b => b.addEventListener("click", () => {
     swaps = swaps.filter(x => x.id !== b.dataset.id);
     store.save("life.swaps", swaps);

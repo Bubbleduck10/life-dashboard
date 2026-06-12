@@ -84,7 +84,10 @@
           <span id="month-label" style="min-width:140px;text-align:center;display:inline-block"></span>
           <button class="btn small ghost" id="month-next" type="button">▶</button>
         </span>
-        <span class="muted" id="month-totals"></span>
+        <span style="text-align:right">
+          <span id="month-totals"></span>
+          <span class="muted" id="month-swapped" style="display:block;font-size:12px;font-weight:400"></span>
+        </span>
       </h2>
       <table>
         <thead><tr><th>Day</th><th class="num">Starting SOL</th><th class="num">Ending SOL</th><th class="num">Profit (SOL)</th><th class="num">Profit (USD)</th><th></th></tr></thead>
@@ -93,7 +96,10 @@
     </div>
 
     <div class="panel">
-      <h2>SOL swaps</h2>
+      <h2>
+        <span>SOL swaps <span class="muted" id="swap-month-label" style="font-weight:400"></span></span>
+        <span class="muted" id="swap-alltime" style="font-size:12px;font-weight:400"></span>
+      </h2>
       <form class="row" id="swap-form">
         <label class="field">Date
           <input id="swap-date" type="date">

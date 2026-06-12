@@ -6,6 +6,10 @@ const CHAT_INTENTS = [
     answer: "Go to <strong>💵 Money → Log a trading day</strong>: pick the date, enter your <strong>starting SOL</strong> and <strong>ending SOL</strong>, and hit Log day. Profit = ending − starting, and the USD value is calculated automatically. Logging the same date again overwrites that day."
   },
   {
+    keywords: ["currency", "usdc", "different coin", "change coin", "eth instead", "btc instead", "other coin", "trade eth", "trade btc"],
+    answer: "The <strong>Currency</strong> selector in the Log-a-trading-day form lets each day be tracked in <strong>SOL, USDC, ETH, or BTC</strong>. USDC counts as $1 flat; ETH and BTC get live prices and historical day-of closes just like SOL. Mixed months show a per-coin breakdown plus the combined USD total."
+  },
+  {
     keywords: ["note", "notes", "pencil", "journal", "write on a day"],
     answer: "Every day in the Money table has a <strong>✎ pencil</strong> next to the ✕. Click it to add a note (like a mini trading journal) — it shows in italics under that day, and the pencil turns amber on days that have one. Click again to edit, clear the text to remove."
   },

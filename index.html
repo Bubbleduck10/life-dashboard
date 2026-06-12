@@ -55,7 +55,7 @@
       <div class="panel">
         <h2><span>💵 Daily profits</span><span class="muted" style="font-size:12px;font-weight:400">today</span></h2>
         <table>
-          <thead><tr><th>Day</th><th class="num">Profit (SOL)</th><th class="num">Profit (USD)</th></tr></thead>
+          <thead><tr><th>Day</th><th class="num">Profit</th><th class="num">Profit (USD)</th></tr></thead>
           <tbody id="dash-profit-rows"></tbody>
         </table>
       </div>
@@ -89,10 +89,18 @@
         <label class="field">Date
           <input id="trade-date" type="date" required>
         </label>
-        <label class="field">Starting SOL
+        <label class="field">Currency
+          <select id="trade-coin">
+            <option>SOL</option>
+            <option>USDC</option>
+            <option>ETH</option>
+            <option>BTC</option>
+          </select>
+        </label>
+        <label class="field"><span>Starting <span class="coin-label">SOL</span></span>
           <input id="trade-start" type="number" step="any" style="width:130px" required>
         </label>
-        <label class="field">Ending SOL
+        <label class="field"><span>Ending <span class="coin-label">SOL</span></span>
           <input id="trade-end" type="number" step="any" style="width:130px" required>
         </label>
         <button class="btn" type="submit">Log day</button>
@@ -114,7 +122,7 @@
         </span>
       </h2>
       <table>
-        <thead><tr><th>Day</th><th class="num">Starting SOL</th><th class="num">Ending SOL</th><th class="num">Profit (SOL)</th><th class="num">Profit (USD)</th><th></th></tr></thead>
+        <thead><tr><th>Day</th><th class="num">Starting</th><th class="num">Ending</th><th class="num">Profit</th><th class="num">Profit (USD)</th><th></th></tr></thead>
         <tbody id="trade-rows"></tbody>
       </table>
     </div>

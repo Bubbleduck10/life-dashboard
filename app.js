@@ -41,51 +41,82 @@ document.querySelectorAll("nav button").forEach(btn => {
 let viewMonth = todayStr().slice(0, 7); // which month the daily log table shows
 
 const tradeProfit = t => t.endSol - t.startSol;
-const fmtSol = n => (n >= 0 ? "+" : "") + n.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " SOL";
+const tradeCoin = t => t.coin || "SOL";
+const fmtAmt = (n, coin = "SOL") => (n >= 0 ? "+" : "") + n.toLocaleString(undefined, { maximumFractionDigits: 2 }) + " " + coin;
+const fmtSol = n => fmtAmt(n, "SOL");
 
-/* --- historical SOL prices: each day's profit is valued at that day's close --- */
-let solHist = store.load("life.solHist", {}); // "YYYY-MM-DD" -> USD close price
+// currencies the daily log supports; USDC is pegged so no price lookups
+const COINS = {
+  SOL:  { cgId: "solana",   cb: "SOL-USD" },
+  USDC: { fixed: 1 },
+  ETH:  { cgId: "ethereum", cb: "ETH-USD" },
+  BTC:  { cgId: "bitcoin",  cb: "BTC-USD" },
+};
+
+function livePrice(coin) {
+  const def = COINS[coin];
+  if (!def) return null;
+  if (def.fixed != null) return def.fixed;
+  const c = priceCache["cg:" + def.cgId];
+  return c && isFinite(c.price) ? c.price : null;
+}
+
+/* --- historical prices: each day's profit is valued at that day's close --- */
+let coinHist = store.load("life.coinHist", null); // {SOL: {"YYYY-MM-DD": close}, ...}
+if (!coinHist) coinHist = { SOL: store.load("life.solHist", {}) }; // migrate old format
 let solHistBusy = false;
 const solHistAttempted = new Set();
 
-function histSolPrice(date) {
-  if (date === todayStr()) { const sp = solPriceInfo(); if (sp) return sp.price; }
-  return solHist[date] ?? solPriceInfo()?.price ?? null;
+function histPrice(coin, date) {
+  if (COINS[coin]?.fixed != null) return COINS[coin].fixed;
+  if (date === todayStr()) { const lp = livePrice(coin); if (lp != null) return lp; }
+  return (coinHist[coin] || {})[date] ?? livePrice(coin) ?? null;
 }
 
 const usdForTrade = t => {
-  const p = histSolPrice(t.date);
+  const p = histPrice(tradeCoin(t), t.date);
   return p != null ? tradeProfit(t) * p : null;
 };
 
 async function ensureSolHistory() {
   if (solHistBusy) return;
-  const missing = [...new Set(trades.map(t => t.date))]
-    .filter(d => d < todayStr() && !(d in solHist) && !solHistAttempted.has(d))
-    .sort();
-  if (!missing.length) return;
+  // group missing dates by coin (skip pegged coins and today)
+  const byCoin = {};
+  for (const t of trades) {
+    const coin = tradeCoin(t);
+    if (!COINS[coin] || COINS[coin].fixed != null) continue;
+    const key = coin + "|" + t.date;
+    if (t.date < todayStr() && !(coinHist[coin] || {})[t.date] && !solHistAttempted.has(key)) {
+      (byCoin[coin] = byCoin[coin] || new Set()).add(t.date);
+      solHistAttempted.add(key);
+    }
+  }
+  if (!Object.keys(byCoin).length) return;
   solHistBusy = true;
-  missing.forEach(d => solHistAttempted.add(d));
-  try {
-    // Coinbase daily candles, max ~300 per request
-    let from = new Date(missing[0] + "T00:00:00Z");
-    const end = new Date(missing[missing.length - 1] + "T00:00:00Z");
-    let got = false;
-    while (from <= end) {
-      const to = new Date(Math.min(from.getTime() + 299 * 86400e3, end.getTime() + 86400e3));
-      const res = await fetch(`https://api.exchange.coinbase.com/products/SOL-USD/candles?granularity=86400&start=${from.toISOString()}&end=${to.toISOString()}`);
-      if (!res.ok) throw new Error("history " + res.status);
-      for (const c of await res.json()) {
-        solHist[new Date(c[0] * 1000).toISOString().slice(0, 10)] = c[4]; // close
-        got = true;
+  let got = false;
+  for (const coin in byCoin) {
+    const missing = [...byCoin[coin]].sort();
+    coinHist[coin] = coinHist[coin] || {};
+    try {
+      // Coinbase daily candles, max ~300 per request
+      let from = new Date(missing[0] + "T00:00:00Z");
+      const end = new Date(missing[missing.length - 1] + "T00:00:00Z");
+      while (from <= end) {
+        const to = new Date(Math.min(from.getTime() + 299 * 86400e3, end.getTime() + 86400e3));
+        const res = await fetch(`https://api.exchange.coinbase.com/products/${COINS[coin].cb}/candles?granularity=86400&start=${from.toISOString()}&end=${to.toISOString()}`);
+        if (!res.ok) throw new Error("history " + res.status);
+        for (const c of await res.json()) {
+          coinHist[coin][new Date(c[0] * 1000).toISOString().slice(0, 10)] = c[4]; // close
+          got = true;
+        }
+        from = new Date(to.getTime());
       }
-      from = new Date(to.getTime());
-    }
-    if (got) {
-      store.save("life.solHist", solHist);
-      renderMoney(); renderDashboard();
-    }
-  } catch {} // fall back to live price for unpriced days
+    } catch {} // fall back to live price for unpriced days
+  }
+  if (got) {
+    store.save("life.coinHist", coinHist);
+    renderMoney(); renderDashboard();
+  }
   solHistBusy = false;
 }
 
@@ -94,36 +125,53 @@ function solPriceInfo() {
   return c && isFinite(c.price) ? c : null;
 }
 
-// SOL price drives all USD conversions (like the "SOL Price" cell in the spreadsheet).
-// Fetched independently of the Assets tab so it works even with no SOL asset added.
+// Live prices for SOL plus any other coins used in the daily log.
+// Fetched independently of the Assets tab so it works even with no assets added.
 async function ensureSolPrice(force) {
-  const c = solPriceInfo();
-  if (!force && c && Date.now() - c.updated < 10 * 60 * 1000) return;
+  const ids = [...new Set(["solana", ...trades.map(t => COINS[tradeCoin(t)]?.cgId).filter(Boolean)])];
+  const stale = ids.some(id => {
+    const c = priceCache["cg:" + id];
+    return !(c && isFinite(c.price) && Date.now() - c.updated < 10 * 60 * 1000);
+  });
+  if (!force && !stale) return;
   try {
-    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd&include_24hr_change=true");
+    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(",")}&vs_currencies=usd&include_24hr_change=true`);
     const data = await res.json();
-    if (data.solana && isFinite(data.solana.usd)) {
-      priceCache["cg:solana"] = { price: data.solana.usd, change24h: data.solana.usd_24h_change ?? null, updated: Date.now() };
+    let got = false;
+    for (const id of ids) {
+      if (data[id] && isFinite(data[id].usd)) {
+        priceCache["cg:" + id] = { price: data[id].usd, change24h: data[id].usd_24h_change ?? null, updated: Date.now() };
+        got = true;
+      }
+    }
+    if (got) {
       store.save("life.prices", priceCache);
       renderMoney(); renderDashboard();
     }
   } catch {}
 }
 
+document.getElementById("trade-coin").addEventListener("change", () => {
+  document.querySelectorAll(".coin-label").forEach(el => el.textContent = document.getElementById("trade-coin").value);
+});
+
 document.getElementById("trade-form").addEventListener("submit", e => {
   e.preventDefault();
   const date = document.getElementById("trade-date").value || todayStr();
+  const coin = document.getElementById("trade-coin").value;
   const startSol = parseFloat(document.getElementById("trade-start").value);
   const endSol = parseFloat(document.getElementById("trade-end").value);
   if (!isFinite(startSol) || !isFinite(endSol)) return;
   const existing = trades.find(t => t.date === date);
-  if (existing) { existing.startSol = startSol; existing.endSol = endSol; }
-  else trades.push({ id: uid(), date, startSol, endSol });
+  if (existing) { existing.startSol = startSol; existing.endSol = endSol; existing.coin = coin; }
+  else trades.push({ id: uid(), date, startSol, endSol, coin });
   store.save("life.trades", trades);
   viewMonth = date.slice(0, 7);
   e.target.reset();
   document.getElementById("trade-date").value = todayStr();
+  document.querySelectorAll(".coin-label").forEach(el => el.textContent = "SOL");
   renderMoney(); renderDashboard();
+  ensureSolPrice();   // new coins may need a live price
   ensureSolHistory(); // back-dated entries need that day's price
 });
 
@@ -151,14 +199,20 @@ document.getElementById("swap-form").addEventListener("submit", e => {
 });
 
 function sumTrades(list) {
-  const sol = list.reduce((s, t) => s + tradeProfit(t), 0);
+  const coins = {};
   let usd = null;
   for (const t of list) {
-    const u = usdForTrade(t); // valued at that day's SOL price
+    const c = tradeCoin(t);
+    coins[c] = (coins[c] || 0) + tradeProfit(t);
+    const u = usdForTrade(t); // valued at that day's price for that coin
     if (u != null) usd = (usd ?? 0) + u;
   }
-  return { sol, usd, days: list.length };
+  const sol = Object.values(coins).reduce((s, v) => s + v, 0); // sign source when USD unavailable
+  return { coins, sol, usd, days: list.length };
 }
+
+// "+3.4 SOL" or "+3.4 SOL · −0.2 ETH" for mixed months
+const fmtCoins = coins => Object.entries(coins).map(([c, v]) => fmtAmt(v, c)).join(" · ") || "+0 SOL";
 
 const monthTotals = monthPrefix => sumTrades(trades.filter(t => t.date.startsWith(monthPrefix)));
 
@@ -173,9 +227,10 @@ function renderMoney() {
   const todaySub = document.getElementById("money-today-sub");
   if (todayTrade) {
     const pSol = tradeProfit(todayTrade);
-    todayEl.textContent = price != null ? fmtMoney(pSol * price) : "—";
+    const tUsd = usdForTrade(todayTrade);
+    todayEl.textContent = tUsd != null ? fmtMoney(tUsd) : "—";
     todayEl.className = "big " + (pSol > 0 ? "up" : pSol < 0 ? "down" : "");
-    todaySub.textContent = fmtSol(pSol) + ` (${todayTrade.startSol} → ${todayTrade.endSol})`;
+    todaySub.textContent = fmtAmt(pSol, tradeCoin(todayTrade)) + ` (${todayTrade.startSol} → ${todayTrade.endSol})`;
   } else {
     todayEl.textContent = "$0.00"; todayEl.className = "big";
     todaySub.textContent = "no entry yet — log today below";
@@ -183,9 +238,10 @@ function renderMoney() {
 
   const mt = monthTotals(t.slice(0, 7));
   const monthEl = document.getElementById("money-month");
+  const mtSign = mt.usd ?? mt.sol;
   monthEl.textContent = mt.usd != null ? fmtMoney(mt.usd) : "—";
-  monthEl.className = "big " + (mt.sol > 0 ? "up" : mt.sol < 0 ? "down" : "");
-  document.getElementById("money-month-sub").textContent = fmtSol(mt.sol) + ` over ${mt.days} day${mt.days === 1 ? "" : "s"}`;
+  monthEl.className = "big " + (mtSign > 0 ? "up" : mtSign < 0 ? "down" : "");
+  document.getElementById("money-month-sub").textContent = fmtCoins(mt.coins) + ` over ${mt.days} day${mt.days === 1 ? "" : "s"}`;
 
   const priceEl = document.getElementById("sol-price");
   priceEl.textContent = price != null ? fmtPrice(price) : "—";
@@ -205,14 +261,16 @@ function renderMoney() {
   const viewYear = viewMonth.slice(0, 4);
   const ytd = sumTrades(trades.filter(t => t.date.slice(0, 4) === viewYear && t.date.slice(0, 7) <= viewMonth));
   const ytdEl = document.getElementById("ytd-totals");
+  const ytdSign = ytd.usd ?? ytd.sol;
   ytdEl.textContent = ytd.days
-    ? `${viewYear} YTD: ${fmtSol(ytd.sol)}${ytd.usd != null ? " · " + fmtMoney(ytd.usd) : ""}` : "";
-  ytdEl.className = ytd.sol > 0 ? "up" : ytd.sol < 0 ? "down" : "muted";
+    ? `${viewYear} YTD: ${fmtCoins(ytd.coins)}${ytd.usd != null ? " · " + fmtMoney(ytd.usd) : ""}` : "";
+  ytdEl.className = ytdSign > 0 ? "up" : ytdSign < 0 ? "down" : "muted";
 
   const totEl = document.getElementById("month-totals");
+  const vtSign = vt.usd ?? vt.sol;
   totEl.textContent = vt.days
-    ? `month total: ${fmtSol(vt.sol)}${vt.usd != null ? " · " + fmtMoney(vt.usd) : ""}` : "";
-  totEl.className = vt.sol > 0 ? "up" : vt.sol < 0 ? "down" : "muted";
+    ? `month total: ${fmtCoins(vt.coins)}${vt.usd != null ? " · " + fmtMoney(vt.usd) : ""}` : "";
+  totEl.className = vtSign > 0 ? "up" : vtSign < 0 ? "down" : "muted";
 
   const monthSwaps = swaps.filter(x => x.date.startsWith(viewMonth));
   const msSol = monthSwaps.reduce((s, x) => s + x.sol, 0);
@@ -224,18 +282,19 @@ function renderMoney() {
   const tbody = document.getElementById("trade-rows");
   tbody.innerHTML = rows.length ? rows.map(x => {
     const pSol = tradeProfit(x);
+    const coin = tradeCoin(x);
     const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
-    const dayPrice = histSolPrice(x.date);
+    const dayPrice = histPrice(coin, x.date);
     const usd = usdForTrade(x);
     const priceNote = dayPrice != null
-      ? (x.date === todayStr() || solHist[x.date] == null ? `live price ${fmtPrice(dayPrice)}` : `SOL ${fmtPrice(dayPrice)} on ${x.date}`)
+      ? (x.date === todayStr() || (coinHist[coin] || {})[x.date] == null ? `live price ${fmtPrice(dayPrice)}` : `${coin} ${fmtPrice(dayPrice)} on ${x.date}`)
       : "";
     return `
     <tr>
-      <td>${esc(x.date)}</td>
+      <td>${esc(x.date)}${coin !== "SOL" ? ` <span class="muted" style="font-size:11px">${coin}</span>` : ""}</td>
       <td class="num">${x.startSol}</td>
       <td class="num">${x.endSol}</td>
-      <td class="num ${cls}">${fmtSol(pSol)}</td>
+      <td class="num ${cls}">${fmtAmt(pSol, coin)}</td>
       <td class="num ${cls}" title="${priceNote}">${usd != null ? fmtMoney(usd) : "—"}</td>
       <td class="num" style="white-space:nowrap">
         <button class="del note-btn ${x.note ? "has-note" : ""}" data-act="note" data-id="${x.id}" title="${x.note ? "Edit note" : "Add note"}">✎</button>
@@ -246,8 +305,8 @@ function renderMoney() {
   }).join("") + (rows.length > 1 ? `
     <tr class="totals">
       <td colspan="3">Month total</td>
-      <td class="num ${vt.sol > 0 ? "up" : vt.sol < 0 ? "down" : ""}">${fmtSol(vt.sol)}</td>
-      <td class="num ${vt.sol > 0 ? "up" : vt.sol < 0 ? "down" : ""}">${vt.usd != null ? fmtMoney(vt.usd) : "—"}</td>
+      <td class="num ${vtSign > 0 ? "up" : vtSign < 0 ? "down" : ""}">${fmtCoins(vt.coins)}</td>
+      <td class="num ${vtSign > 0 ? "up" : vtSign < 0 ? "down" : ""}">${vt.usd != null ? fmtMoney(vt.usd) : "—"}</td>
       <td></td>
     </tr>` : "")
     : `<tr><td colspan="6" class="empty">No trading days logged for this month.</td></tr>`;
@@ -805,9 +864,9 @@ function renderDashboard() {
   const sp = solPriceInfo();
   const todayTrade = trades.find(x => x.date === t);
   const pSol = todayTrade ? tradeProfit(todayTrade) : 0;
-  setMoneyStat("dash-money", todayTrade && sp ? pSol * sp.price : 0);
+  setMoneyStat("dash-money", todayTrade ? (usdForTrade(todayTrade) ?? 0) : 0);
   document.getElementById("dash-money-sub").textContent = todayTrade
-    ? fmtSol(pSol) + " trading today" : "no trading entry yet";
+    ? fmtAmt(pSol, tradeCoin(todayTrade)) + " trading today" : "no trading entry yet";
 
   const pt = portfolioTotals();
   document.getElementById("dash-port").textContent = pt.priced ? fmtMoney(pt.value) : "—";
@@ -839,7 +898,7 @@ function renderDashboard() {
     const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
     return `<tr>
       <td>Today <span class="muted">(${todayTrade.startSol} → ${todayTrade.endSol})</span></td>
-      <td class="num ${cls}">${fmtSol(pSol)}</td>
+      <td class="num ${cls}">${fmtAmt(pSol, tradeCoin(todayTrade))}</td>
       <td class="num ${cls}">${usd != null ? fmtMoney(usd) : "—"}</td>
     </tr>`;
   })() : `<tr><td colspan="3" class="empty">No entry for today yet — log it on the Money tab.</td></tr>`;

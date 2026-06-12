@@ -82,7 +82,7 @@ function weekStats(start, end, days) {
   return {
     logged: wt.length,
     green: wt.filter(t => tradeProfit(t) > 0).length,
-    net: wt.reduce((s, t) => s + tradeProfit(t), 0),
+    net: wt.reduce((s, t) => s + (usdForTrade(t) ?? 0), 0), // USD so mixed coins compare fairly
     foodDays, under,
   };
 }
@@ -90,7 +90,7 @@ function weekStats(start, end, days) {
 const WEEKLY_CHALLENGES = [
   { id: "wk-green", icon: "🟢", name: "Green Week", desc: "3 green days", xp: 75, target: 3, value: s => s.green },
   { id: "wk-log", icon: "📒", name: "Consistency", desc: "log 5 trading days", xp: 50, target: 5, value: s => s.logged },
-  { id: "wk-net", icon: "🚀", name: "Finish Ahead", desc: "end the week net positive (3+ days)", xp: 100, target: 1, value: s => (s.net > 0 && s.logged >= 3) ? 1 : 0, detail: s => fmtSol(s.net) },
+  { id: "wk-net", icon: "🚀", name: "Finish Ahead", desc: "end the week net positive (3+ days)", xp: 100, target: 1, value: s => (s.net > 0 && s.logged >= 3) ? 1 : 0, detail: s => fmtMoney(s.net) },
   { id: "wk-food", icon: "🍎", name: "Fuel Log", desc: "log food on 4 days", xp: 50, target: 4, value: s => s.foodDays },
   { id: "wk-clean", icon: "💪", name: "Clean Week", desc: "3 days under calorie goal", xp: 75, target: 3, value: s => s.under },
 ];

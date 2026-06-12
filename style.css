@@ -208,6 +208,40 @@ td.num, th.num { text-align: right; }
   gap: 14px;
 }
 
+/* meal builder */
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 6px;
+}
+
+label.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+}
+
+label.check:hover { border-color: var(--accent); }
+label.check:has(input:checked) { border-color: var(--accent); background: rgba(79, 140, 255, .12); }
+label.check .kcal { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+.builder-group { margin-top: 12px; }
+.builder-group .gname {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
 @media (max-width: 800px) {
   .cols { grid-template-columns: 1fr; }
 }

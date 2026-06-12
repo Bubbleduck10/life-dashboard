@@ -522,6 +522,59 @@ document.getElementById("food-form").addEventListener("submit", e => {
   renderFood(); renderDashboard();
 });
 
+/* ----- "Eating out" meal builder ----- */
+const mbRestaurant = document.getElementById("mb-restaurant");
+mbRestaurant.innerHTML = Object.keys(MEAL_BUILDER).map(r => `<option>${esc(r)}</option>`).join("");
+
+function mbConfig() { return MEAL_BUILDER[mbRestaurant.value]; }
+
+function renderBuilder() {
+  const conf = mbConfig();
+  document.getElementById("mb-formats").innerHTML = conf.formats.map((f, i) => `
+    <label class="check"><input type="radio" name="mb-format" value="${i}" ${i === 0 ? "checked" : ""}>
+      ${esc(f.name)}<span class="kcal">${f.kcal ? "+" + f.kcal : f.mult > 1 ? "×" + f.mult : ""}</span>
+    </label>`).join("");
+  document.getElementById("mb-groups").innerHTML = conf.groups.map((g, gi) => `
+    <div class="builder-group">
+      <div class="gname">${esc(g.name)}</div>
+      <div class="check-grid">${g.items.map((it, ii) => `
+        <label class="check"><input type="checkbox" data-g="${gi}" data-i="${ii}">
+          ${esc(it.name)}<span class="kcal">${it.kcal} cal</span>
+        </label>`).join("")}</div>
+    </div>`).join("");
+  document.querySelectorAll("#mb-formats input, #mb-groups input").forEach(el =>
+    el.addEventListener("change", updateBuilderTotal));
+  updateBuilderTotal();
+}
+
+function builderSelection() {
+  const conf = mbConfig();
+  const fmt = conf.formats[+document.querySelector('input[name="mb-format"]:checked').value];
+  const picked = [...document.querySelectorAll("#mb-groups input:checked")]
+    .map(el => conf.groups[+el.dataset.g].items[+el.dataset.i]);
+  const total = Math.round(fmt.kcal + fmt.mult * picked.reduce((s, it) => s + it.kcal, 0));
+  return { fmt, picked, total };
+}
+
+function updateBuilderTotal() {
+  const { total } = builderSelection();
+  document.getElementById("mb-log").textContent = `Log meal — ${total.toLocaleString()} cal`;
+}
+
+mbRestaurant.addEventListener("change", renderBuilder);
+document.getElementById("mb-clear").addEventListener("click", renderBuilder);
+document.getElementById("mb-log").addEventListener("click", () => {
+  const { fmt, picked, total } = builderSelection();
+  if (!picked.length) return;
+  const name = `${mbRestaurant.value} ${fmt.name.split(" (")[0]} — ${picked.map(p => p.name.toLowerCase()).join(", ")}`;
+  food.push({ id: uid(), date: todayStr(), name, kcal: total, servings: 1 });
+  store.save("life.food", food);
+  renderBuilder();
+  renderFood(); renderDashboard();
+});
+
+renderBuilder();
+
 document.getElementById("cal-goal").addEventListener("change", e => {
   const v = parseInt(e.target.value);
   if (isFinite(v) && v > 0) { settings.calGoal = v; store.save("life.settings", settings); }

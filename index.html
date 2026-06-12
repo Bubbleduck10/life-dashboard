@@ -213,6 +213,24 @@
         <tbody id="food-rows"></tbody>
       </table>
     </div>
+
+    <div class="panel">
+      <h2>
+        <span>🌯 Eating out? Build your meal</span>
+        <span class="muted" style="font-size:12px;font-weight:400">check what's in it — calories add up</span>
+      </h2>
+      <div class="row" style="margin-bottom:12px">
+        <label class="field">Restaurant
+          <select id="mb-restaurant"></select>
+        </label>
+        <div id="mb-formats" class="check-grid" style="flex:1"></div>
+      </div>
+      <div id="mb-groups"></div>
+      <div class="row" style="margin-top:14px;align-items:center">
+        <button class="btn" id="mb-log" type="button">Log meal — 0 cal</button>
+        <button class="btn small ghost" id="mb-clear" type="button">Clear</button>
+      </div>
+    </div>
     <div class="panel">
       <h2>Last 7 days</h2>
       <table><tbody id="food-history"></tbody></table>

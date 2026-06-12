@@ -163,4 +163,105 @@ const FOOD_DB = [
   { name: "Wine (red)", serving: "5 oz glass", kcal: 125 },
   { name: "Smoothie (fruit)", serving: "16 oz", kcal: 280 },
   { name: "Protein shake", serving: "1 scoop + water", kcal: 130 },
+
+  // Fast food chains (published values, approximate)
+  { name: "McDonald's Big Mac", serving: "1 burger", kcal: 590 },
+  { name: "McDonald's Quarter Pounder w/ Cheese", serving: "1 burger", kcal: 520 },
+  { name: "McDonald's McChicken", serving: "1 sandwich", kcal: 400 },
+  { name: "McDonald's fries", serving: "medium", kcal: 320 },
+  { name: "McDonald's McNuggets", serving: "10 piece", kcal: 410 },
+  { name: "Burger King Whopper", serving: "1 burger", kcal: 670 },
+  { name: "Wendy's Dave's Single", serving: "1 burger", kcal: 590 },
+  { name: "Wendy's Baconator", serving: "1 burger", kcal: 950 },
+  { name: "Chick-fil-A Chicken Sandwich", serving: "1 sandwich", kcal: 440 },
+  { name: "Chick-fil-A Nuggets", serving: "12 count", kcal: 380 },
+  { name: "Chick-fil-A Waffle Fries", serving: "medium", kcal: 420 },
+  { name: "Popeyes Chicken Sandwich", serving: "1 sandwich", kcal: 700 },
+  { name: "Taco Bell Crunchwrap Supreme", serving: "1 crunchwrap", kcal: 530 },
+  { name: "Taco Bell Doritos Locos Taco", serving: "1 taco", kcal: 170 },
+  { name: "Taco Bell Bean Burrito", serving: "1 burrito", kcal: 350 },
+  { name: "In-N-Out Double-Double", serving: "1 burger", kcal: 670 },
+  { name: "In-N-Out fries", serving: "1 order", kcal: 370 },
+  { name: "Five Guys Cheeseburger", serving: "1 burger", kcal: 840 },
+  { name: "Five Guys fries", serving: "little", kcal: 530 },
+  { name: "Raising Cane's chicken finger", serving: "1 finger", kcal: 130 },
+  { name: "Raising Cane's crinkle fries", serving: "1 order", kcal: 390 },
+  { name: "Raising Cane's Texas toast", serving: "1 slice", kcal: 150 },
+  { name: "Raising Cane's sauce", serving: "1 cup", kcal: 190 },
+  { name: "Panda Express Orange Chicken", serving: "1 serving", kcal: 490 },
+  { name: "Panda Express Chow Mein", serving: "1 serving", kcal: 510 },
+  { name: "Panda Express Fried Rice", serving: "1 serving", kcal: 520 },
+  { name: "Domino's pepperoni pizza", serving: "1 slice (large)", kcal: 290 },
+  { name: "KFC fried chicken breast", serving: "1 piece", kcal: 390 },
+  { name: "Chipotle chips", serving: "1 bag", kcal: 540 },
 ];
+
+// "Eating out" meal builder: pick a base, check what's in it, calories sum up.
+// Values from the chains' published nutrition info (approximate).
+const MEAL_BUILDER = {
+  "Chipotle": {
+    formats: [
+      { name: "Bowl / Salad", kcal: 0, mult: 1 },
+      { name: "Burrito (flour tortilla)", kcal: 320, mult: 1 },
+      { name: "3 Tacos (shells)", kcal: 240, mult: 1 },
+    ],
+    groups: [
+      { name: "Protein", items: [
+        { name: "Chicken", kcal: 180 }, { name: "Steak", kcal: 150 },
+        { name: "Barbacoa", kcal: 170 }, { name: "Carnitas", kcal: 210 },
+        { name: "Sofritas", kcal: 150 }, { name: "Double protein (add again)", kcal: 180 },
+      ]},
+      { name: "Rice & Beans", items: [
+        { name: "White rice", kcal: 210 }, { name: "Brown rice", kcal: 210 },
+        { name: "Black beans", kcal: 130 }, { name: "Pinto beans", kcal: 130 },
+      ]},
+      { name: "Toppings", items: [
+        { name: "Fajita veggies", kcal: 20 }, { name: "Fresh tomato salsa", kcal: 25 },
+        { name: "Corn salsa", kcal: 80 }, { name: "Green chili salsa", kcal: 15 },
+        { name: "Red chili salsa", kcal: 30 }, { name: "Cheese", kcal: 110 },
+        { name: "Sour cream", kcal: 110 }, { name: "Guacamole", kcal: 230 },
+        { name: "Queso blanco", kcal: 120 }, { name: "Lettuce", kcal: 5 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Chips", kcal: 540 }, { name: "Side of guac", kcal: 230 },
+        { name: "Side of queso", kcal: 120 },
+      ]},
+    ],
+  },
+  "Subway": {
+    formats: [
+      { name: "6-inch", kcal: 0, mult: 1 },
+      { name: "Footlong (doubles everything)", kcal: 0, mult: 2 },
+    ],
+    groups: [
+      { name: "Bread", items: [
+        { name: "Italian bread", kcal: 200 }, { name: "Wheat bread", kcal: 210 },
+        { name: "Italian Herbs & Cheese", kcal: 240 }, { name: "Wrap", kcal: 290 },
+        { name: "No bread (salad)", kcal: 0 },
+      ]},
+      { name: "Protein", items: [
+        { name: "Turkey", kcal: 50 }, { name: "Ham", kcal: 60 },
+        { name: "Roast beef", kcal: 80 }, { name: "Rotisserie chicken", kcal: 80 },
+        { name: "Steak", kcal: 110 }, { name: "Tuna", kcal: 250 },
+        { name: "Meatballs in marinara", kcal: 240 },
+      ]},
+      { name: "Cheese", items: [
+        { name: "American cheese", kcal: 40 }, { name: "Provolone", kcal: 50 },
+        { name: "Pepper jack", kcal: 50 },
+      ]},
+      { name: "Veggies", items: [
+        { name: "Lettuce", kcal: 5 }, { name: "Tomatoes", kcal: 10 },
+        { name: "Onions", kcal: 10 }, { name: "Green peppers", kcal: 5 },
+        { name: "Cucumbers", kcal: 5 }, { name: "Pickles", kcal: 0 },
+        { name: "Olives", kcal: 15 }, { name: "Spinach", kcal: 5 },
+        { name: "Jalapeños", kcal: 5 }, { name: "Avocado", kcal: 60 },
+      ]},
+      { name: "Sauce", items: [
+        { name: "Mayo", kcal: 100 }, { name: "Light mayo", kcal: 50 },
+        { name: "Ranch", kcal: 110 }, { name: "Chipotle Southwest", kcal: 100 },
+        { name: "Sweet onion", kcal: 40 }, { name: "Honey mustard", kcal: 30 },
+        { name: "Yellow mustard", kcal: 10 }, { name: "Oil & vinegar", kcal: 45 },
+      ]},
+    ],
+  },
+};

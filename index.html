@@ -391,6 +391,13 @@
           <input id="imp-file" type="file" accept=".csv,text/csv" style="display:none">
         </label>
       </div>
+      <div class="row" style="margin-top:10px">
+        <label class="field" style="flex:1;min-width:240px">…or paste a Google Sheets link (set sharing to "Anyone with the link — Viewer")
+          <input id="imp-url" placeholder="https://docs.google.com/spreadsheets/d/…">
+        </label>
+        <button class="btn small" id="imp-fetch" type="button">Fetch sheet</button>
+      </div>
+      <p class="muted" style="margin-top:6px">The tab that's open when you copy the link is the one that imports. To go back to private afterwards, just flip sharing back to Restricted.</p>
       <div id="imp-map" style="display:none"></div>
       <p class="statusmsg" id="imp-status" style="margin-top:10px"></p>
     </div>

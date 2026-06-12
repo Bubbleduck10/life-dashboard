@@ -71,7 +71,7 @@ const CHAT_INTENTS = [
   },
   {
     keywords: ["spreadsheet", "google sheet", "sheets", "excel", "csv", "upload", "import", "previous data", "old data", "migrate"],
-    answer: "Got history in Google Sheets or Excel? Export it as a CSV (in Sheets: <strong>File → Download → Comma Separated Values</strong>), then use <strong>☁ Sync → 📄 Import from a spreadsheet</strong>: upload the file, confirm which columns are the date / starting / ending balance, and your whole history logs itself — daily profits or swaps. It handles $ signs, different date formats, and skips days you've already logged."
+    answer: "Got history in Google Sheets or Excel? Use <strong>☁ Sync → 📄 Import from a spreadsheet</strong>. Easiest path: set your Google Sheet's sharing to <em>Anyone with the link — Viewer</em>, paste the link, and hit <strong>Fetch sheet</strong> — the open tab imports directly (you can flip sharing back to Restricted after). Or upload a CSV file instead. Either way you confirm the column mapping with a preview, and it handles $ signs, odd date formats, and days you've already logged."
   },
   {
     keywords: ["data", "stored", "privacy", "private", "where is my data", "who can see", "secure", "safe"],

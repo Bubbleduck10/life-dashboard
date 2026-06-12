@@ -198,3 +198,33 @@ function impImport() {
 document.getElementById("imp-type").addEventListener("change", () => {
   if (impRows.length) renderImpMap();
 });
+
+/* ----- fetch a link-shared Google Sheet directly ----- */
+document.getElementById("imp-fetch").addEventListener("click", fetchSheet);
+document.getElementById("imp-url").addEventListener("keydown", e => {
+  if (e.key === "Enter") { e.preventDefault(); fetchSheet(); }
+});
+
+async function fetchSheet() {
+  const url = document.getElementById("imp-url").value.trim();
+  const status = document.getElementById("imp-status");
+  const m = url.match(/spreadsheets\/d\/([a-zA-Z0-9_-]+)/);
+  if (!m) {
+    status.textContent = "That doesn't look like a Google Sheets link — it should contain /spreadsheets/d/…";
+    return;
+  }
+  const id = m[1];
+  const gid = (url.match(/[#?&]gid=(\d+)/) || [])[1] || "0";
+  status.textContent = "Fetching your sheet from Google…";
+  try {
+    // gviz CSV endpoint allows cross-origin reads for link-shared sheets
+    const res = await fetch(`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&gid=${gid}`);
+    if (!res.ok) throw new Error(String(res.status));
+    const text = await res.text();
+    if (text.trim().startsWith("<")) throw new Error("html"); // got a sign-in page
+    impLoadText(text);
+    if (impRows.length) status.textContent = `Fetched ${impRows.length} rows — check the column mapping below.`;
+  } catch {
+    status.textContent = "Couldn't read that sheet. Make sure sharing is set to “Anyone with the link — Viewer” (Share button, top right in Google Sheets), then try again.";
+  }
+}

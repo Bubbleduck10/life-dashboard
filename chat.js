@@ -103,7 +103,7 @@ const CHAT_INTENTS = [
   },
   {
     keywords: ["demo", "sample data", "fake data", "try it", "is this real"],
-    answer: "You're looking at <strong>demo mode</strong> if there's a banner up top — everything is sample data so you can explore safely. Click <strong>Exit demo</strong> in the banner to start fresh with your own (real) data. Your demo clicks never touch anyone's real numbers."
+    answer: "You're in <strong>demo mode</strong> if there's a banner up top — a sandbox where you can try everything without it being saved to any account. Click <strong>Exit demo</strong> in the banner to use the app for real. Demo entries never touch anyone's real numbers."
   },
   {
     keywords: ["hello", "hi", "hey", "yo", "sup", "morning"],

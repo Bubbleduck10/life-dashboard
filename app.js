@@ -13,7 +13,6 @@ const store = {
   }
 };
 
-if (window.DEMO_SEED) DEMO_SEED(store); // seed sample data before state loads
 
 let trades = store.load("life.trades", []);  // {id, date, startSol, endSol}
 let swaps  = store.load("life.swaps", []);   // {id, date, sol, usd}

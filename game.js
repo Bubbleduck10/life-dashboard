@@ -206,6 +206,23 @@ function showToast(html) {
   document.body.appendChild(el);
   setTimeout(() => el.classList.add("show"), 30);
   setTimeout(() => { el.classList.remove("show"); setTimeout(() => el.remove(), 400); }, 4500);
+  confettiBurst();
+}
+
+function confettiBurst() {
+  const colors = ["#4f8cff", "#34d399", "#fbbf24", "#f87171", "#7c5cff", "#fff"];
+  for (let i = 0; i < 60; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = 2 + Math.random() * 2.5 + "s";
+    c.style.animationDelay = Math.random() * .8 + "s";
+    c.style.borderRadius = Math.random() < .5 ? "50%" : "2px";
+    c.style.transform = `rotate(${Math.random() * 360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5500);
+  }
 }
 
 function renderGame() {

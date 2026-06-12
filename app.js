@@ -150,8 +150,7 @@ document.getElementById("swap-form").addEventListener("submit", e => {
   renderMoney();
 });
 
-function monthTotals(monthPrefix) {
-  const list = trades.filter(t => t.date.startsWith(monthPrefix));
+function sumTrades(list) {
   const sol = list.reduce((s, t) => s + tradeProfit(t), 0);
   let usd = null;
   for (const t of list) {
@@ -160,6 +159,8 @@ function monthTotals(monthPrefix) {
   }
   return { sol, usd, days: list.length };
 }
+
+const monthTotals = monthPrefix => sumTrades(trades.filter(t => t.date.startsWith(monthPrefix)));
 
 function renderMoney() {
   const sp = solPriceInfo();
@@ -199,6 +200,15 @@ function renderMoney() {
   document.getElementById("month-label").textContent =
     new Date(vy, vm - 1, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
   const vt = monthTotals(viewMonth);
+
+  // YTD: Jan 1 of the viewed year through the end of the viewed month
+  const viewYear = viewMonth.slice(0, 4);
+  const ytd = sumTrades(trades.filter(t => t.date.slice(0, 4) === viewYear && t.date.slice(0, 7) <= viewMonth));
+  const ytdEl = document.getElementById("ytd-totals");
+  ytdEl.textContent = ytd.days
+    ? `${viewYear} YTD: ${fmtSol(ytd.sol)}${ytd.usd != null ? " · " + fmtMoney(ytd.usd) : ""}` : "";
+  ytdEl.className = ytd.sol > 0 ? "up" : ytd.sol < 0 ? "down" : "muted";
+
   const totEl = document.getElementById("month-totals");
   totEl.textContent = vt.days
     ? `month total: ${fmtSol(vt.sol)}${vt.usd != null ? " · " + fmtMoney(vt.usd) : ""}` : "";

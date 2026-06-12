@@ -605,10 +605,10 @@ function goalHtml(g, compact) {
   </div>`;
 }
 
-function renderGoals() {
-  const wrap = document.getElementById("goal-list");
-  wrap.innerHTML = goals.length ? goals.map(g => goalHtml(g, false)).join("")
-    : `<div class="empty">No goals yet — add one above (e.g. "Save $5,000" or "Run 100 miles").</div>`;
+function renderGoalList(wrap, compact) {
+  wrap.innerHTML = goals.length ? goals.map(g => goalHtml(g, compact)).join("")
+    : `<div class="empty">No goals yet — add one on the Goals tab (e.g. "Save $5,000" or "Run 100 miles").</div>`;
+  if (compact) return;
 
   wrap.querySelectorAll(".goal").forEach(el => {
     const g = goals.find(x => x.id === el.dataset.id);
@@ -631,6 +631,10 @@ function renderGoals() {
       renderGoals(); renderDashboard();
     });
   });
+}
+
+function renderGoals() {
+  renderGoalList(document.getElementById("goal-list"), false);
 }
 
 /* ============ Dashboard ============ */
@@ -663,11 +667,39 @@ function renderDashboard() {
   document.getElementById("dash-goals").textContent = goals.length ? `${doneGoals} / ${goals.length}` : "—";
   document.getElementById("dash-goals-sub").textContent = goals.length ? "goals completed" : "no goals yet";
 
-  const goalsHtml = goals.length
-    ? goals.map(g => goalHtml(g, true)).join("")
-    : `<div class="empty">Add goals on the Goals tab to see progress here.</div>`;
-  document.getElementById("dash-goal-list").innerHTML = goalsHtml;
-  document.getElementById("money-goal-list").innerHTML = goalsHtml;
+  // goals: interactive on the overview, compact on the money tab
+  renderGoalList(document.getElementById("dash-goal-list"), false);
+  renderGoalList(document.getElementById("money-goal-list"), true);
+
+  // daily profits: last 7 logged trading days
+  const recent = [...trades].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 7);
+  document.getElementById("dash-profit-rows").innerHTML = recent.length ? recent.map(x => {
+    const pSol = tradeProfit(x);
+    const usd = usdForTrade(x);
+    const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
+    return `<tr>
+      <td>${x.date === t ? "Today" : esc(x.date)}</td>
+      <td class="num ${cls}">${fmtSol(pSol)}</td>
+      <td class="num ${cls}">${usd != null ? fmtMoney(usd) : "—"}</td>
+    </tr>`;
+  }).join("") : `<tr><td colspan="3" class="empty">No trading days logged yet.</td></tr>`;
+
+  // daily food progress
+  const todaysFood = food.filter(f => f.date === t);
+  const pct = Math.min(100, (cals / settings.calGoal) * 100);
+  const bar = document.getElementById("dash-food-bar");
+  bar.className = "bar" + (cals > settings.calGoal ? " over" : cals >= settings.calGoal ? " full" : "");
+  bar.querySelector("span").style.width = pct + "%";
+  document.getElementById("dash-food-text").textContent =
+    `${cals.toLocaleString()} / ${settings.calGoal.toLocaleString()} cal · ${cals <= settings.calGoal
+      ? (settings.calGoal - cals).toLocaleString() + " left"
+      : (cals - settings.calGoal).toLocaleString() + " over"}`;
+  document.getElementById("dash-food-items").innerHTML = todaysFood.length
+    ? [...todaysFood].reverse().map(f => `<tr>
+        <td>${esc(f.name)}${f.servings !== 1 ? ` <span class="muted">× ${f.servings}</span>` : ""}</td>
+        <td class="num">${f.kcal.toLocaleString()} cal</td>
+      </tr>`).join("")
+    : `<tr><td colspan="2" class="empty">Nothing logged today — add meals on the Food tab.</td></tr>`;
 }
 
 /* ============ Init ============ */

@@ -202,6 +202,18 @@ td.num, th.num { text-align: right; }
 
 .del:hover { color: var(--red); background: rgba(248,113,113,.1); }
 
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 800px) {
+  .cols { grid-template-columns: 1fr; }
+}
+
+.bar.over > span { background: var(--red); }
+
 td.p-pos { color: var(--green); background: rgba(52, 211, 153, .08); font-weight: 600; }
 td.p-neg { color: var(--red); background: rgba(248, 113, 113, .08); font-weight: 600; }
 tr.totals td { font-weight: 700; border-top: 2px solid var(--border); border-bottom: none; }

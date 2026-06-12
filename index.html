@@ -46,8 +46,22 @@
         <div class="sub" id="dash-goals-sub"></div>
       </div>
     </div>
+    <div class="cols">
+      <div class="panel">
+        <h2><span>💵 Daily profits</span><span class="muted" style="font-size:12px;font-weight:400">last 7 entries</span></h2>
+        <table>
+          <thead><tr><th>Day</th><th class="num">Profit (SOL)</th><th class="num">Profit (USD)</th></tr></thead>
+          <tbody id="dash-profit-rows"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2><span>🍎 Daily food</span><span class="muted" id="dash-food-text" style="font-size:12px;font-weight:400"></span></h2>
+        <div class="bar" id="dash-food-bar"><span></span></div>
+        <table><tbody id="dash-food-items"></tbody></table>
+      </div>
+    </div>
     <div class="panel">
-      <h2>Goal progress</h2>
+      <h2>🎯 Goal progress</h2>
       <div id="dash-goal-list"></div>
     </div>
   </section>

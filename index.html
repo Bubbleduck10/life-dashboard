@@ -366,6 +366,36 @@
     </div>
 
     <div class="panel">
+      <h2>📄 Import from a spreadsheet</h2>
+      <p class="muted" style="margin-bottom:12px">
+        Coming from Google Sheets or Excel? Export your sheet as a CSV
+        (in Sheets: <strong>File → Download → Comma Separated Values</strong>), upload it here,
+        confirm the columns, and your history logs itself.
+      </p>
+      <div class="row">
+        <label class="field">What's in the file
+          <select id="imp-type">
+            <option value="trades">Daily profits (date, starting, ending)</option>
+            <option value="swaps">Swaps (date, # coin, $ total)</option>
+          </select>
+        </label>
+        <label class="field">Currency
+          <select id="imp-coin">
+            <option>SOL</option>
+            <option>USDC</option>
+            <option>ETH</option>
+            <option>BTC</option>
+          </select>
+        </label>
+        <label class="btn small ghost" style="cursor:pointer">📂 Choose CSV file
+          <input id="imp-file" type="file" accept=".csv,text/csv" style="display:none">
+        </label>
+      </div>
+      <div id="imp-map" style="display:none"></div>
+      <p class="statusmsg" id="imp-status" style="margin-top:10px"></p>
+    </div>
+
+    <div class="panel">
       <h2>Backup file</h2>
       <p class="muted" style="margin-bottom:12px">Belt and suspenders: download all your data as a file, or restore from one.</p>
       <div class="row">
@@ -397,6 +427,7 @@
 <script src="app.js"></script>
 <script src="game.js"></script>
 <script src="sync.js"></script>
+<script src="import.js"></script>
 <script src="chat.js"></script>
 </body>
 </html>

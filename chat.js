@@ -66,8 +66,12 @@ const CHAT_INTENTS = [
     answer: "Go to <strong>☁ Sync</strong> and follow the 3 steps — it links to GitHub's token page with the right settings pre-filled; generate, copy, paste it in the app. Use the <strong>same token on each device</strong> and they all share one cloud save (a private Gist in your own GitHub account). Changes upload automatically seconds after you log them."
   },
   {
-    keywords: ["backup", "export", "import", "restore", "file"],
+    keywords: ["backup", "export", "restore"],
     answer: "On the <strong>☁ Sync</strong> tab: <strong>⬇ Export backup</strong> downloads all your data as one file; <strong>⬆ Import backup</strong> restores from it (replacing what's on the device). Handy for moving between browsers or keeping an offline copy."
+  },
+  {
+    keywords: ["spreadsheet", "google sheet", "sheets", "excel", "csv", "upload", "import", "previous data", "old data", "migrate"],
+    answer: "Got history in Google Sheets or Excel? Export it as a CSV (in Sheets: <strong>File → Download → Comma Separated Values</strong>), then use <strong>☁ Sync → 📄 Import from a spreadsheet</strong>: upload the file, confirm which columns are the date / starting / ending balance, and your whole history logs itself — daily profits or swaps. It handles $ signs, different date formats, and skips days you've already logged."
   },
   {
     keywords: ["data", "stored", "privacy", "private", "where is my data", "who can see", "secure", "safe"],

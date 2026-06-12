@@ -336,6 +336,37 @@
   <!-- ============ SYNC ============ -->
   <section class="tab" id="tab-sync">
     <div class="panel">
+      <h2>👤 Account</h2>
+      <div id="account-not-configured">
+        <p class="muted">Accounts are coming soon — log in once, and your data follows you on any device automatically. For now, use ☁ Cloud sync or a backup file below.</p>
+      </div>
+      <div id="account-signed-out" style="display:none">
+        <p class="muted" style="margin-bottom:12px">Log in and your data saves to your account automatically — open the app anywhere and pick up where you left off.</p>
+        <div class="row">
+          <label class="field" style="flex:1;min-width:180px">Email
+            <input id="account-em" type="email" autocomplete="email" placeholder="you@example.com">
+          </label>
+          <label class="field" style="flex:1;min-width:160px">Password
+            <input id="account-pw" type="password" autocomplete="current-password" placeholder="6+ characters">
+          </label>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="account-login" type="button">Log in</button>
+          <button class="btn ghost" id="account-signup" type="button">Sign up</button>
+          <button class="btn ghost" id="account-google" type="button">Continue with Google</button>
+        </div>
+        <p class="statusmsg" id="account-msg" style="margin-top:10px"></p>
+      </div>
+      <div id="account-signed-in" style="display:none">
+        <p style="margin-bottom:10px">Signed in as <strong id="account-email"></strong> — your data backs up to your account automatically and syncs across your devices.</p>
+        <div class="row">
+          <button class="btn small ghost" id="account-signout" type="button">Sign out</button>
+        </div>
+        <p class="statusmsg" id="account-sync-status" style="margin-top:10px"></p>
+      </div>
+    </div>
+
+    <div class="panel">
       <h2>☁ Cloud sync <span class="muted" id="sync-indicator"></span></h2>
       <div id="sync-setup">
         <p class="muted" style="margin-bottom:12px">
@@ -435,6 +466,8 @@
 <script src="app.js"></script>
 <script src="game.js"></script>
 <script src="sync.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
 <script src="import.js"></script>
 <script src="chat.js"></script>
 </body>

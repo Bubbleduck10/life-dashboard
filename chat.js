@@ -66,6 +66,10 @@ const CHAT_INTENTS = [
     answer: "<strong>Daily quests</strong> (Arcade) are today's checklist: log your trade, end green, log meals, stay under your calorie goal. <strong>Weekly challenges</strong> (Overview + Arcade) run Monday–Sunday: 3 green days, log 5 days, finish the week net positive, log food 4 days, and 3 days under calorie goal — each pays XP, and completing all 5 in one week unlocks 🌟 Perfect Week."
   },
   {
+    keywords: ["account", "log in", "login", "sign up", "signup", "sign in", "password", "google sign"],
+    answer: "On the <strong>☁ Sync</strong> tab, the <strong>👤 Account</strong> panel lets you sign up with email + password or continue with Google. Once you're logged in, your data saves to your account automatically and follows you on any device — just log in there too. Signing out leaves your data on the device; logging back in re-syncs it."
+  },
+  {
     keywords: ["sync", "phone", "devices", "token", "github", "connect", "another device", "link"],
     answer: "Go to <strong>☁ Sync</strong> and follow the 3 steps — it links to GitHub's token page with the right settings pre-filled; generate, copy, paste it in the app. Use the <strong>same token on each device</strong> and they all share one cloud save (a private Gist in your own GitHub account). Changes upload automatically seconds after you log them."
   },

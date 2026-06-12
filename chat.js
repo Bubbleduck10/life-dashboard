@@ -102,6 +102,10 @@ const CHAT_INTENTS = [
     answer: "This app is a static web app — plain HTML, CSS, and JavaScript, hosted free on GitHub Pages. The source code lives in the owner's GitHub repository."
   },
   {
+    keywords: ["demo", "sample data", "fake data", "try it", "is this real"],
+    answer: "You're looking at <strong>demo mode</strong> if there's a banner up top — everything is sample data so you can explore safely. Click <strong>Exit demo</strong> in the banner to start fresh with your own (real) data. Your demo clicks never touch anyone's real numbers."
+  },
+  {
     keywords: ["hello", "hi", "hey", "yo", "sup", "morning"],
     answer: "Hey! 👋 Ask me anything about the app — logging trades, syncing your phone, the meal builder, XP… or tap one of the suggestions below."
   },

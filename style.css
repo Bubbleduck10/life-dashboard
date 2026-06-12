@@ -284,6 +284,22 @@ td.num, th.num { text-align: right; }
 .ach-name { font-weight: 700; font-size: 14px; }
 .ach-desc { font-size: 12px; color: var(--muted); }
 
+/* demo mode */
+.demo-banner {
+  background: linear-gradient(90deg, rgba(251,191,36,.18), rgba(79,140,255,.18));
+  border-bottom: 1px solid rgba(251,191,36,.4);
+  color: var(--text);
+  text-align: center;
+  padding: 9px 16px;
+  font-size: 13.5px;
+}
+
+.demo-banner a {
+  color: var(--accent);
+  font-weight: 700;
+  margin-left: 6px;
+}
+
 /* help chat */
 #chat-fab {
   position: fixed;

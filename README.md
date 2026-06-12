@@ -4,6 +4,8 @@ Your all-in-one tracker for money, assets, food, and goals.
 
 **Live app: https://bubbleduck10.github.io/life-dashboard/**
 
+**Try the demo (sample data, nothing saved): https://bubbleduck10.github.io/life-dashboard/?demo**
+
 Open that URL on any device (bookmark it / add to your phone's home screen).
 You can also run it locally by double-clicking `Life Dashboard.bat`.
 

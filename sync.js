@@ -64,6 +64,7 @@ async function gistPull() {
 }
 
 async function gistPush() {
+  if (window.IS_DEMO) return;
   if (!sync.token || !sync.gistId || syncBusy) return;
   syncBusy = true;
   try {
@@ -156,6 +157,7 @@ async function connectSync() {
 }
 
 async function pullLatest(silent) {
+  if (window.IS_DEMO) return;
   if (!sync.token || !sync.gistId) return;
   try {
     const remote = await gistPull();
@@ -221,7 +223,14 @@ document.getElementById("sync-disconnect-btn").addEventListener("click", disconn
 document.getElementById("export-btn").addEventListener("click", exportBackup);
 document.getElementById("import-file").addEventListener("change", e => { if (e.target.files[0]) importBackup(e.target.files[0]); e.target.value = ""; });
 
-renderSyncPanel();
-if (sync.token && sync.gistId) pullLatest(true);
-// check for newer cloud data periodically (catches edits made on another device)
-setInterval(() => pullLatest(true), 5 * 60 * 1000);
+if (window.IS_DEMO) {
+  document.getElementById("sync-setup").innerHTML =
+    `<p class="muted">☁ Cloud sync is disabled in demo mode. In the real app, your data syncs across your devices through your own private GitHub Gist — no account on any third-party service.</p>`;
+  document.getElementById("sync-connected").style.display = "none";
+  setSyncStatus("Demo mode — sync off.");
+} else {
+  renderSyncPanel();
+  if (sync.token && sync.gistId) pullLatest(true);
+  // check for newer cloud data periodically (catches edits made on another device)
+  setInterval(() => pullLatest(true), 5 * 60 * 1000);
+}

@@ -1,14 +1,19 @@
 /* ============ Storage ============ */
+// In demo mode (?demo) every key is prefixed so sample data lives in its own
+// space and the user's real data is never read or written.
+const KEY_PREFIX = window.IS_DEMO ? "demo." : "";
 const store = {
   load(key, fallback) {
-    try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    try { return JSON.parse(localStorage.getItem(KEY_PREFIX + key)) ?? fallback; }
     catch { return fallback; }
   },
   save(key, val) {
-    localStorage.setItem(key, JSON.stringify(val));
+    localStorage.setItem(KEY_PREFIX + key, JSON.stringify(val));
     if (window.onDataChanged) window.onDataChanged(key);
   }
 };
+
+if (window.DEMO_SEED) DEMO_SEED(store); // seed sample data before state loads
 
 let trades = store.load("life.trades", []);  // {id, date, startSol, endSol}
 let swaps  = store.load("life.swaps", []);   // {id, date, sol, usd}

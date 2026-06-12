@@ -10,7 +10,10 @@
 <div class="app">
   <header>
     <h1>🌟 Life Dashboard</h1>
-    <span class="date" id="today-date"></span>
+    <span style="display:flex;align-items:center;gap:12px">
+      <button class="level-badge" id="level-badge" type="button" title="Open the Arcade">🏆</button>
+      <span class="date" id="today-date"></span>
+    </span>
   </header>
 
   <nav>
@@ -19,11 +22,13 @@
     <button data-tab="assets">📈 Assets</button>
     <button data-tab="food">🍎 Food</button>
     <button data-tab="goals">🎯 Goals</button>
+    <button data-tab="arcade">🏆 Arcade</button>
     <button data-tab="sync">☁ Sync</button>
   </nav>
 
   <!-- ============ OVERVIEW ============ -->
   <section class="tab active" id="tab-dash">
+    <div id="dash-streaks" class="streaks"></div>
     <div class="grid">
       <div class="card">
         <h3>Profit today</h3>
@@ -291,6 +296,27 @@
       <div id="goal-list"></div>
     </div>
   </section>
+  <!-- ============ ARCADE ============ -->
+  <section class="tab" id="tab-arcade">
+    <div class="panel">
+      <div id="game-level" class="row" style="align-items:center;gap:18px"></div>
+    </div>
+    <div class="cols">
+      <div class="panel">
+        <h2>📋 Daily quests</h2>
+        <div id="game-quests"></div>
+      </div>
+      <div class="panel">
+        <h2>🔥 Streaks</h2>
+        <div id="game-streaks"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2><span>🏅 Achievements</span><span class="muted" id="ach-count" style="font-size:13px;font-weight:400"></span></h2>
+      <div id="game-achievements" class="ach-grid"></div>
+    </div>
+  </section>
+
   <!-- ============ SYNC ============ -->
   <section class="tab" id="tab-sync">
     <div class="panel">
@@ -338,6 +364,7 @@
 
 <script src="foods.js"></script>
 <script src="app.js"></script>
+<script src="game.js"></script>
 <script src="sync.js"></script>
 </body>
 </html>

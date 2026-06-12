@@ -846,6 +846,8 @@ function renderDashboard() {
         <td class="num">${f.kcal.toLocaleString()} cal</td>
       </tr>`).join("")
     : `<tr><td colspan="2" class="empty">Nothing logged today — add meals on the Food tab.</td></tr>`;
+
+  if (window.renderGame) renderGame(); // game layer recomputes from the same data
 }
 
 /* ============ Init ============ */

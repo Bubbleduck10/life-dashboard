@@ -869,6 +869,71 @@ function renderGoals() {
   renderGoalList(document.getElementById("goal-list"), false);
 }
 
+/* ============ Daily to-do list ============ */
+let todos = store.load("life.todos", []); // {id, text, done, doneDate}
+// a new day clears tasks finished on previous days; unfinished ones carry over
+{
+  const keep = todos.filter(x => !(x.done && x.doneDate !== todayStr()));
+  if (keep.length !== todos.length) { todos = keep; store.save("life.todos", todos); }
+}
+
+function addTodo(text) {
+  text = text.trim();
+  if (!text) return;
+  todos.push({ id: uid(), text, done: false, doneDate: null });
+  store.save("life.todos", todos);
+  renderTodos();
+}
+
+function toggleTodo(id) {
+  const x = todos.find(t => t.id === id);
+  if (!x) return;
+  x.done = !x.done;
+  x.doneDate = x.done ? todayStr() : null;
+  store.save("life.todos", todos);
+  renderTodos();
+}
+
+document.getElementById("todo-form").addEventListener("submit", e => {
+  e.preventDefault();
+  addTodo(document.getElementById("todo-input").value);
+  document.getElementById("todo-input").value = "";
+});
+
+document.getElementById("note-form").addEventListener("submit", e => {
+  e.preventDefault();
+  addTodo(document.getElementById("note-input").value);
+  document.getElementById("note-input").value = "";
+});
+
+function renderTodos() {
+  const doneN = todos.filter(x => x.done).length;
+  document.getElementById("todo-count").textContent = todos.length ? `${doneN} / ${todos.length} done` : "";
+
+  // goals tab list
+  const list = document.getElementById("todo-list");
+  list.innerHTML = todos.length ? todos.map(x => `
+    <div class="quest ${x.done ? "done" : ""}">
+      <span class="qcheck todo-check" data-id="${x.id}" style="cursor:pointer" title="${x.done ? "Uncheck" : "Done!"}">${x.done ? "✅" : "⬜"}</span>
+      <span style="${x.done ? "text-decoration:line-through;opacity:.55" : ""}">${esc(x.text)}</span>
+      <button class="del todo-del" data-id="${x.id}" style="margin-left:auto" title="Remove">✕</button>
+    </div>`).join("")
+    : `<div class="empty">Nothing on today's list — add a task above.</div>`;
+  list.querySelectorAll(".todo-check").forEach(el => el.addEventListener("click", () => toggleTodo(el.dataset.id)));
+  list.querySelectorAll(".todo-del").forEach(el => el.addEventListener("click", () => {
+    todos = todos.filter(t => t.id !== el.dataset.id);
+    store.save("life.todos", todos);
+    renderTodos();
+  }));
+
+  // overview pinned note (click a line to toggle)
+  const note = document.getElementById("dash-todo-list");
+  note.innerHTML = todos.length ? todos.map(x => `
+    <li class="${x.done ? "done" : ""}" data-id="${x.id}" title="${x.done ? "Click to uncheck" : "Click when done"}">${esc(x.text)}</li>`).join("")
+    : `<li class="placeholder">nothing yet — jot something down</li>`;
+  note.querySelectorAll("li[data-id]").forEach(el => el.addEventListener("click", () => toggleTodo(el.dataset.id)));
+}
+
 /* ============ Dashboard ============ */
 function renderDashboard() {
   const t = todayStr();
@@ -945,6 +1010,7 @@ renderMoney();
 renderAssets();
 renderFood();
 renderGoals();
+renderTodos();
 renderDashboard();
 if (assets.length) refreshPrices();
 

@@ -46,6 +46,10 @@ const CHAT_INTENTS = [
     answer: "Click <strong>+ Add restaurant</strong> in the meal builder. Pick from the library (10 chains with menus included — one click) or <strong>create your own</strong>: name it, then add menu items with categories and calories. Custom menus are saved and sync to your other devices."
   },
   {
+    keywords: ["todo", "to-do", "to do", "task", "tasks", "checklist", "pinned note", "paper note"],
+    answer: "The <strong>📝 Daily to-do list</strong> lives at the top of the Goals tab — add tasks, check them off, ✕ to remove. It's also pinned to your Overview as the paper note on the right: click a line to check it off, or type in the note to add a task. Finished tasks clear overnight; unfinished ones carry over to today."
+  },
+  {
     keywords: ["goal", "goals", "target", "progress bar"],
     answer: "On <strong>🎯 Goals</strong>, add anything with a number target — \"Save $5,000\", \"Run 100 miles\". Update progress with <strong>Add</strong> (adds to the total) or <strong>Set total</strong> (replaces it). Goal cards on the Overview work the same way, so you can update without switching tabs."
   },

@@ -261,6 +261,84 @@ td.num, th.num { text-align: right; }
   gap: 14px;
 }
 
+/* daily to-do pinned note */
+.dash-top { display: flex; gap: 20px; align-items: flex-start; }
+.dash-top-main { flex: 1; min-width: 0; }
+
+.todo-note {
+  position: relative;
+  width: 240px;
+  flex-shrink: 0;
+  background:
+    repeating-linear-gradient(transparent, transparent 25px, rgba(120, 90, 20, .14) 26px),
+    linear-gradient(160deg, #fdf3b9, #f5e69b);
+  color: #4a4226;
+  border-radius: 4px;
+  padding: 20px 16px 14px;
+  margin-top: 10px;
+  transform: rotate(1.6deg);
+  box-shadow: 4px 8px 22px rgba(0, 0, 0, .45);
+  font-family: "Segoe Print", "Comic Sans MS", cursive;
+  font-size: 14px;
+  transition: transform .2s ease;
+}
+
+.todo-note:hover { transform: rotate(.4deg) scale(1.02); }
+
+.todo-note .pin {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-12deg);
+  font-size: 24px;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .4));
+}
+
+.todo-note-title {
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 6px;
+  border-bottom: 2px solid rgba(120, 90, 20, .25);
+  padding-bottom: 4px;
+}
+
+.todo-note ul { list-style: none; margin: 0; padding: 0; }
+
+.todo-note li {
+  padding: 3px 2px;
+  line-height: 26px;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(120, 90, 20, .18);
+}
+
+.todo-note li::before { content: "☐ "; }
+.todo-note li.done::before { content: "☑ "; }
+.todo-note li.done { text-decoration: line-through; opacity: .55; }
+.todo-note li:hover { background: rgba(255, 255, 255, .25); }
+.todo-note li.placeholder { cursor: default; opacity: .55; font-style: italic; }
+.todo-note li.placeholder::before { content: ""; }
+
+.todo-note input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(120, 90, 20, .4);
+  border-radius: 0;
+  color: #4a4226;
+  font-family: inherit;
+  font-size: 14px;
+  padding: 6px 2px;
+  margin-top: 6px;
+}
+
+.todo-note input::placeholder { color: rgba(74, 66, 38, .5); }
+.todo-note input:focus { outline: none; box-shadow: none; border-bottom-color: #8a7a3a; }
+
+@media (max-width: 900px) {
+  .dash-top { flex-direction: column; }
+  .todo-note { width: min(280px, 100%); align-self: flex-end; transform: rotate(1deg); margin-top: 16px; }
+}
+
 /* gamification */
 .level-badge {
   background: linear-gradient(135deg, rgba(79,140,255,.25), rgba(52,211,153,.25));

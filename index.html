@@ -28,6 +28,8 @@
 
   <!-- ============ OVERVIEW ============ -->
   <section class="tab active" id="tab-dash">
+    <div class="dash-top">
+    <div class="dash-top-main">
     <div id="dash-streaks" class="streaks"></div>
     <div class="grid">
       <div class="card">
@@ -50,6 +52,16 @@
         <div class="big" id="dash-goals">—</div>
         <div class="sub" id="dash-goals-sub"></div>
       </div>
+    </div>
+    </div>
+    <aside class="todo-note" id="dash-todo-note">
+      <div class="pin">📌</div>
+      <div class="todo-note-title">today's to-dos</div>
+      <ul id="dash-todo-list"></ul>
+      <form id="note-form" autocomplete="off">
+        <input id="note-input" placeholder="+ add a task…">
+      </form>
+    </aside>
     </div>
     <div class="cols">
       <div class="panel">
@@ -285,6 +297,18 @@
 
   <!-- ============ GOALS ============ -->
   <section class="tab" id="tab-goals">
+    <div class="panel">
+      <h2><span>📝 Daily to-do list</span><span class="muted" id="todo-count" style="font-size:13px;font-weight:400"></span></h2>
+      <form class="row" id="todo-form">
+        <label class="field" style="flex:1;min-width:200px">Task for today
+          <input id="todo-input" placeholder="e.g. Review yesterday's trades, hit the gym…">
+        </label>
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <div id="todo-list" style="margin-top:14px"></div>
+      <p class="muted" style="margin-top:8px">Checked-off tasks clear overnight; unfinished ones carry over to the next day. The list is also pinned to your Overview.</p>
+    </div>
+
     <div class="panel">
       <h2>Add a goal</h2>
       <form class="row" id="goal-form">

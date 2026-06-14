@@ -42,8 +42,8 @@ const CHAT_INTENTS = [
     answer: "Use <strong>🌯 Build your meal</strong> on the Food tab: pick the restaurant, check off exactly what's in your order (base, protein, toppings, sides), and the calories sum up live — one click logs the whole meal. Don't see your spot? Hit <strong>+ Add restaurant</strong>."
   },
   {
-    keywords: ["add restaurant", "new restaurant", "custom menu", "my own restaurant", "local spot"],
-    answer: "Click <strong>+ Add restaurant</strong> in the meal builder. Pick from the library (10 chains with menus included — one click) or <strong>create your own</strong>: name it, then add menu items with categories and calories. Custom menus are saved and sync to your other devices."
+    keywords: ["add restaurant", "new restaurant", "custom menu", "my own restaurant", "local spot", "load menu", "menu automatically"],
+    answer: "Click <strong>+ Add restaurant</strong> in the meal builder and <strong>search by name</strong> — there's a built-in library of 40+ chains (McDonald's, Chipotle, Olive Garden, Starbucks, Panda Express…). Pick one and its <strong>full menu loads automatically</strong>, no typing. Only for a spot that isn't listed (a local place) do you create it and add the items yourself — and those custom menus save and sync to your devices."
   },
   {
     keywords: ["todo", "to-do", "to do", "task", "tasks", "checklist", "pinned note", "paper note"],

@@ -259,11 +259,12 @@
 
       <div id="mb-add-panel" style="display:none;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px">
         <div class="builder-group" style="margin-top:0">
-          <div class="gname">Popular restaurants — click one to add it (menu included)</div>
+          <div class="gname">Search a restaurant — pick one and its full menu loads automatically</div>
+          <input id="mb-search" placeholder="🔍 type a restaurant name… (e.g. Chipotle, McDonald's, Olive Garden)" style="width:100%;margin-bottom:10px">
           <div class="check-grid" id="mb-library"></div>
         </div>
-        <div class="row" style="margin-top:12px">
-          <label class="field" style="flex:1;min-width:180px">Or create your own (you build the menu)
+        <div class="row" style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+          <label class="field" style="flex:1;min-width:180px">Not listed? Create your own (you add the items)
             <input id="mb-new-name" placeholder="e.g. Tony's Diner">
           </label>
           <button class="btn small" id="mb-create-btn" type="button">Create</button>

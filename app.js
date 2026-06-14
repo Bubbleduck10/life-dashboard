@@ -620,29 +620,56 @@ function renderRestaurantSelect(selectName) {
   renderBuilder();
 }
 
-function renderLibrary() {
-  const available = Object.keys(MEAL_BUILDER).filter(n => !restState.enabled.includes(n));
-  document.getElementById("mb-library").innerHTML = available.length
-    ? available.map(n => `<label class="check" data-lib="${esc(n)}" style="justify-content:center">${esc(n)}</label>`).join("")
-    : `<span class="muted">All built-in restaurants are already on your list.</span>`;
-  document.querySelectorAll("#mb-library [data-lib]").forEach(el => el.addEventListener("click", () => {
-    restState.enabled.push(el.dataset.lib);
+function addFromLibrary(name) {
+  if (!restState.enabled.includes(name)) {
+    restState.enabled.push(name);
     store.save("life.restaurants", restState);
-    document.getElementById("mb-add-panel").style.display = "none";
-    renderRestaurantSelect(el.dataset.lib);
-  }));
+  }
+  document.getElementById("mb-add-panel").style.display = "none";
+  const search = document.getElementById("mb-search");
+  if (search) search.value = "";
+  renderRestaurantSelect(name);
+}
+
+function renderLibrary() {
+  const q = (document.getElementById("mb-search").value || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  let available = Object.keys(MEAL_BUILDER).filter(n => !restState.enabled.includes(n));
+  if (q) available = available.filter(n => n.toLowerCase().replace(/[^a-z0-9]/g, "").includes(q));
+  available.sort((a, b) => a.localeCompare(b));
+
+  const box = document.getElementById("mb-library");
+  if (!available.length) {
+    box.innerHTML = `<span class="muted">${q ? `No built-in match for “${esc(q)}” — create it below and add the items.` : "All built-in restaurants are already on your list."}</span>`;
+    return;
+  }
+  box.innerHTML = available.map(n =>
+    `<label class="check" data-lib="${esc(n)}" style="justify-content:center;cursor:pointer">${esc(n)}</label>`).join("");
+  box.querySelectorAll("[data-lib]").forEach(el =>
+    el.addEventListener("click", () => addFromLibrary(el.dataset.lib)));
 }
 
 document.getElementById("mb-add-btn").addEventListener("click", () => {
   const panel = document.getElementById("mb-add-panel");
-  panel.style.display = panel.style.display === "none" ? "" : "none";
-  renderLibrary();
+  const opening = panel.style.display === "none";
+  panel.style.display = opening ? "" : "none";
+  if (opening) { document.getElementById("mb-search").value = ""; renderLibrary(); document.getElementById("mb-search").focus(); }
 });
+
+document.getElementById("mb-search").addEventListener("input", renderLibrary);
 
 document.getElementById("mb-create-btn").addEventListener("click", () => {
   const name = document.getElementById("mb-new-name").value.trim();
   if (!name) return;
-  if (MEAL_BUILDER[name] || restState.custom[name]) { alert("That restaurant already exists."); return; }
+  // if the typed name matches a built-in chain, load its menu instead of a blank one
+  // (ignore punctuation/spacing so "wendys" finds "Wendy's", "mcdonalds" finds "McDonald's")
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const libMatch = Object.keys(MEAL_BUILDER).find(n => norm(n) === norm(name));
+  if (libMatch) {
+    document.getElementById("mb-new-name").value = "";
+    addFromLibrary(libMatch);
+    return;
+  }
+  if (restState.custom[name] || restState.enabled.includes(name)) { alert("That restaurant is already on your list."); return; }
   restState.custom[name] = { formats: [{ name: "Order", kcal: 0, mult: 1 }], groups: [], custom: true };
   restState.enabled.push(name);
   store.save("life.restaurants", restState);

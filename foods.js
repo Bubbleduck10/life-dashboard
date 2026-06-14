@@ -433,4 +433,480 @@ const MEAL_BUILDER = {
       ]},
     ],
   },
+  "Burger King": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Burgers & Sandwiches", items: [
+        { name: "Whopper", kcal: 670 }, { name: "Double Whopper", kcal: 900 },
+        { name: "Bacon King", kcal: 1150 }, { name: "Cheeseburger", kcal: 300 },
+        { name: "Original Chicken Sandwich", kcal: 660 }, { name: "Ch'King", kcal: 800 },
+        { name: "8pc Nuggets", kcal: 340 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Fries (medium)", kcal: 380 }, { name: "Onion rings (medium)", kcal: 410 },
+        { name: "Mozzarella sticks (4)", kcal: 280 },
+      ]},
+      { name: "Drinks & Desserts", items: [
+        { name: "Soda (medium)", kcal: 220 }, { name: "Chocolate shake", kcal: 690 },
+        { name: "Hershey's pie", kcal: 320 },
+      ]},
+    ],
+  },
+  "Popeyes": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Chicken", items: [
+        { name: "Chicken Sandwich", kcal: 700 }, { name: "Spicy Chicken Sandwich", kcal: 700 },
+        { name: "Chicken breast (mild)", kcal: 380 }, { name: "Chicken thigh", kcal: 280 },
+        { name: "3pc tenders", kcal: 340 }, { name: "6pc nuggets", kcal: 300 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Cajun fries (regular)", kcal: 340 }, { name: "Red beans & rice", kcal: 230 },
+        { name: "Mac & cheese", kcal: 230 }, { name: "Biscuit", kcal: 200 },
+        { name: "Coleslaw", kcal: 200 },
+      ]},
+    ],
+  },
+  "KFC": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Chicken", items: [
+        { name: "Original Recipe breast", kcal: 390 }, { name: "Original Recipe thigh", kcal: 280 },
+        { name: "Original Recipe drumstick", kcal: 130 }, { name: "Extra Crispy breast", kcal: 530 },
+        { name: "Chicken Sandwich", kcal: 650 }, { name: "8pc nuggets", kcal: 340 },
+        { name: "Famous Bowl", kcal: 710 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Mashed potatoes & gravy", kcal: 130 }, { name: "Mac & cheese", kcal: 170 },
+        { name: "Cole slaw", kcal: 170 }, { name: "Biscuit", kcal: 180 },
+        { name: "Fries (individual)", kcal: 320 },
+      ]},
+    ],
+  },
+  "Arby's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Sandwiches", items: [
+        { name: "Classic Roast Beef", kcal: 360 }, { name: "Beef 'n Cheddar", kcal: 450 },
+        { name: "Half Pound Roast Beef", kcal: 610 }, { name: "Crispy Chicken Sandwich", kcal: 530 },
+        { name: "Reuben", kcal: 660 }, { name: "Gyro", kcal: 710 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Curly fries (medium)", kcal: 410 }, { name: "Mozzarella sticks (4)", kcal: 510 },
+        { name: "Jalapeño Bites (5)", kcal: 310 }, { name: "Loaded curly fries", kcal: 560 },
+      ]},
+      { name: "Shakes", items: [
+        { name: "Chocolate shake", kcal: 590 }, { name: "Jamocha shake", kcal: 580 },
+      ]},
+    ],
+  },
+  "Sonic": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Burgers & Dogs", items: [
+        { name: "SuperSONIC Double", kcal: 800 }, { name: "Quarter Pound Double", kcal: 670 },
+        { name: "All-American Hot Dog", kcal: 410 }, { name: "Chili Cheese Coney", kcal: 460 },
+        { name: "Crispy Tenders (3)", kcal: 330 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Tots (medium)", kcal: 330 }, { name: "Fries (medium)", kcal: 330 },
+        { name: "Mozzarella sticks (5)", kcal: 440 }, { name: "Onion rings (medium)", kcal: 440 },
+      ]},
+      { name: "Drinks & Treats", items: [
+        { name: "Cherry limeade (medium)", kcal: 200 }, { name: "Oreo Blast (medium)", kcal: 690 },
+        { name: "Slush (medium)", kcal: 320 },
+      ]},
+    ],
+  },
+  "Jack in the Box": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Burgers & Sandwiches", items: [
+        { name: "Jumbo Jack", kcal: 600 }, { name: "Sourdough Jack", kcal: 710 },
+        { name: "Buttery Jack", kcal: 840 }, { name: "Spicy Chicken Sandwich", kcal: 530 },
+        { name: "Chicken nuggets (5)", kcal: 250 },
+      ]},
+      { name: "Tacos & Sides", items: [
+        { name: "2 Tacos", kcal: 340 }, { name: "Curly fries (medium)", kcal: 360 },
+        { name: "Onion rings", kcal: 500 }, { name: "Stuffed jalapeños (3)", kcal: 230 },
+      ]},
+      { name: "Drinks & Shakes", items: [
+        { name: "Oreo shake", kcal: 740 }, { name: "Soda (medium)", kcal: 200 },
+      ]},
+    ],
+  },
+  "Whataburger": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Burgers & Sandwiches", items: [
+        { name: "Whataburger", kcal: 590 }, { name: "Double Meat Whataburger", kcal: 800 },
+        { name: "Whataburger Jr.", kcal: 310 }, { name: "Whatachick'n Sandwich", kcal: 600 },
+        { name: "Chicken strips (3)", kcal: 470 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Fries (medium)", kcal: 420 }, { name: "Onion rings (medium)", kcal: 420 },
+      ]},
+      { name: "Shakes", items: [
+        { name: "Chocolate shake (medium)", kcal: 670 }, { name: "Soda (medium)", kcal: 230 },
+      ]},
+    ],
+  },
+  "Shake Shack": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Burgers & Sandwiches", items: [
+        { name: "ShackBurger (single)", kcal: 530 }, { name: "ShackBurger (double)", kcal: 770 },
+        { name: "SmokeShack (single)", kcal: 580 }, { name: "Hamburger (single)", kcal: 430 },
+        { name: "Chicken Shack", kcal: 550 }, { name: "Hot dog", kcal: 380 },
+      ]},
+      { name: "Fries & Shakes", items: [
+        { name: "Fries", kcal: 470 }, { name: "Cheese fries", kcal: 590 },
+        { name: "Chocolate shake", kcal: 800 }, { name: "Vanilla shake", kcal: 750 },
+      ]},
+    ],
+  },
+  "Dairy Queen": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Food", items: [
+        { name: "1/4 lb GrillBurger", kcal: 600 }, { name: "Chicken strips (4)", kcal: 640 },
+        { name: "Chicken sandwich", kcal: 530 }, { name: "Fries (medium)", kcal: 380 },
+      ]},
+      { name: "Blizzards & Treats", items: [
+        { name: "Oreo Blizzard (medium)", kcal: 690 }, { name: "M&M Blizzard (medium)", kcal: 840 },
+        { name: "Choc dipped cone (medium)", kcal: 470 }, { name: "Banana split", kcal: 510 },
+        { name: "Dilly Bar", kcal: 240 },
+      ]},
+    ],
+  },
+  "Culver's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "ButterBurgers & More", items: [
+        { name: "ButterBurger (single)", kcal: 380 }, { name: "ButterBurger Deluxe (double)", kcal: 690 },
+        { name: "Bacon Deluxe (double)", kcal: 790 }, { name: "Chicken Sandwich (crispy)", kcal: 710 },
+        { name: "Chicken tenders (3)", kcal: 380 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Crinkle fries (medium)", kcal: 410 }, { name: "Cheese curds (regular)", kcal: 660 },
+        { name: "Onion rings", kcal: 540 },
+      ]},
+      { name: "Custard", items: [
+        { name: "Concrete Mixer (regular)", kcal: 800 }, { name: "Vanilla cone (single)", kcal: 320 },
+        { name: "Sundae", kcal: 500 },
+      ]},
+    ],
+  },
+  "Raising Cane's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Chicken Fingers", items: [
+        { name: "Chicken finger", kcal: 130 }, { name: "Box Combo (4 fingers)", kcal: 520 },
+        { name: "3 Finger Combo", kcal: 390 },
+      ]},
+      { name: "Sides & Extras", items: [
+        { name: "Crinkle fries", kcal: 390 }, { name: "Texas toast", kcal: 150 },
+        { name: "Coleslaw", kcal: 120 }, { name: "Cane's sauce", kcal: 190 },
+      ]},
+      { name: "Drinks", items: [
+        { name: "Sweet tea (regular)", kcal: 160 }, { name: "Lemonade (regular)", kcal: 190 },
+      ]},
+    ],
+  },
+  "Jersey Mike's": {
+    formats: [
+      { name: "Mini", kcal: 0, mult: 0.6 },
+      { name: "Regular (7\")", kcal: 0, mult: 1 },
+      { name: "Giant (15\")", kcal: 0, mult: 2.1 },
+    ],
+    groups: [
+      { name: "Bread & Base", items: [
+        { name: "White bread", kcal: 300 }, { name: "Wheat bread", kcal: 320 },
+        { name: "Rosemary Parm bread", kcal: 360 }, { name: "Tub (no bread)", kcal: 40 },
+      ]},
+      { name: "Sub", items: [
+        { name: "#7 Turkey & Provolone", kcal: 230 }, { name: "#9 Club Supreme", kcal: 360 },
+        { name: "#13 Original Italian", kcal: 380 }, { name: "Philly Cheese Steak", kcal: 400 },
+        { name: "#43 Chipotle Cheese Steak", kcal: 460 }, { name: "Tuna", kcal: 430 },
+      ]},
+      { name: "Toppings", items: [
+        { name: "Lettuce/tomato/onion", kcal: 15 }, { name: "Extra cheese", kcal: 80 },
+        { name: "Mayo", kcal: 100 }, { name: "Oil & vinegar + spices", kcal: 120 },
+      ]},
+    ],
+  },
+  "Jimmy John's": {
+    formats: [{ name: "8\" sub", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Sandwich", items: [
+        { name: "#1 Pepe (ham)", kcal: 600 }, { name: "#4 Turkey Tom", kcal: 510 },
+        { name: "#9 Italian Night Club", kcal: 740 }, { name: "Beach Club", kcal: 740 },
+        { name: "Vito", kcal: 660 }, { name: "Unwich (lettuce wrap, any)", kcal: 250 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Chips", kcal: 230 }, { name: "Jumbo pickle", kcal: 15 },
+        { name: "Chocolate chip cookie", kcal: 420 },
+      ]},
+    ],
+  },
+  "Panera Bread": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Sandwiches & Salads", items: [
+        { name: "Bacon Turkey Bravo", kcal: 770 }, { name: "Chipotle Chicken Avocado", kcal: 920 },
+        { name: "Mediterranean Veggie", kcal: 530 }, { name: "Caesar Salad w/ chicken", kcal: 470 },
+        { name: "Greek Salad", kcal: 380 },
+      ]},
+      { name: "Soups & Mac", items: [
+        { name: "Broccoli Cheddar soup (cup)", kcal: 230 }, { name: "Mac & Cheese (small)", kcal: 480 },
+        { name: "Creamy Tomato soup (cup)", kcal: 230 }, { name: "Bread bowl (add)", kcal: 540 },
+      ]},
+      { name: "Bakery & Drinks", items: [
+        { name: "Bagel (plain)", kcal: 280 }, { name: "Chocolate chip cookie", kcal: 400 },
+        { name: "Cinnamon roll", kcal: 620 }, { name: "Iced coffee", kcal: 5 },
+      ]},
+    ],
+  },
+  "Dunkin'": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Drinks (medium)", items: [
+        { name: "Iced coffee (black)", kcal: 10 }, { name: "Latte", kcal: 190 },
+        { name: "Caramel Iced Macchiato", kcal: 230 }, { name: "Frozen Coffee", kcal: 590 },
+        { name: "Coolatta", kcal: 350 }, { name: "Hot chocolate", kcal: 320 },
+      ]},
+      { name: "Food", items: [
+        { name: "Glazed donut", kcal: 240 }, { name: "Boston Kreme donut", kcal: 300 },
+        { name: "Bacon Egg & Cheese (croissant)", kcal: 540 }, { name: "Sausage Egg & Cheese", kcal: 600 },
+        { name: "Hash browns", kcal: 140 }, { name: "Bagel w/ cream cheese", kcal: 460 },
+        { name: "Munchkins (5)", kcal: 290 },
+      ]},
+    ],
+  },
+  "Domino's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Pizza (large slice)", items: [
+        { name: "Cheese slice", kcal: 290 }, { name: "Pepperoni slice", kcal: 320 },
+        { name: "ExtravaganZZa slice", kcal: 380 }, { name: "Philly Cheese Steak slice", kcal: 320 },
+        { name: "Add a slice", kcal: 300 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Stuffed Cheesy Bread (1pc)", kcal: 140 }, { name: "Boneless wings (4)", kcal: 250 },
+        { name: "Garlic bread twists (1)", kcal: 130 }, { name: "Lava Cake (1)", kcal: 350 },
+        { name: "Ranch dip", kcal: 190 },
+      ]},
+    ],
+  },
+  "Pizza Hut": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Pizza (large slice)", items: [
+        { name: "Cheese slice", kcal: 300 }, { name: "Pepperoni slice", kcal: 320 },
+        { name: "Meat Lover's slice", kcal: 400 }, { name: "Supreme slice", kcal: 340 },
+        { name: "Pan slice (add)", kcal: 330 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Breadsticks (1)", kcal: 140 }, { name: "Cheese sticks (1)", kcal: 140 },
+        { name: "Traditional wings (2)", kcal: 160 }, { name: "Cinnamon sticks (2)", kcal: 170 },
+      ]},
+    ],
+  },
+  "Little Caesars": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Pizza (slice)", items: [
+        { name: "Cheese slice", kcal: 240 }, { name: "Pepperoni slice", kcal: 280 },
+        { name: "Deep Dish pepperoni slice", kcal: 360 }, { name: "Add a slice", kcal: 270 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Crazy Bread (1 stick)", kcal: 100 }, { name: "Italian Cheese Bread (1)", kcal: 130 },
+        { name: "Caesar Wings (2)", kcal: 140 }, { name: "Crazy sauce", kcal: 45 },
+      ]},
+    ],
+  },
+  "Qdoba": {
+    formats: [
+      { name: "Bowl", kcal: 0, mult: 1 },
+      { name: "Burrito (tortilla)", kcal: 300, mult: 1 },
+      { name: "3 Tacos", kcal: 270, mult: 1 },
+    ],
+    groups: [
+      { name: "Protein", items: [
+        { name: "Grilled Chicken", kcal: 160 }, { name: "Steak", kcal: 180 },
+        { name: "Pork", kcal: 170 }, { name: "Impossible", kcal: 230 },
+      ]},
+      { name: "Rice & Beans", items: [
+        { name: "Cilantro lime rice", kcal: 190 }, { name: "Brown rice", kcal: 190 },
+        { name: "Black beans", kcal: 130 }, { name: "Pinto beans", kcal: 130 },
+      ]},
+      { name: "Toppings", items: [
+        { name: "Cheese", kcal: 100 }, { name: "Sour cream", kcal: 60 },
+        { name: "Guacamole", kcal: 200 }, { name: "Queso (3-cheese)", kcal: 120 },
+        { name: "Pico de gallo", kcal: 15 }, { name: "Corn salsa", kcal: 80 },
+        { name: "Fajita veggies", kcal: 30 },
+      ]},
+    ],
+  },
+  "Del Taco": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Tacos & Burritos", items: [
+        { name: "Del Taco (crunchy)", kcal: 160 }, { name: "Grilled Chicken Taco", kcal: 160 },
+        { name: "Epic Cali Burrito", kcal: 980 }, { name: "Bean & Cheese Burrito", kcal: 380 },
+        { name: "Crispy Chicken Taco", kcal: 270 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Crinkle fries (medium)", kcal: 330 }, { name: "Queso Loaded Fries", kcal: 670 },
+        { name: "Nachos", kcal: 380 },
+      ]},
+    ],
+  },
+  "In-N-Out": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Burgers", items: [
+        { name: "Hamburger", kcal: 390 }, { name: "Cheeseburger", kcal: 480 },
+        { name: "Double-Double", kcal: 670 }, { name: "Protein style (any, lettuce wrap)", kcal: 240 },
+        { name: "Animal style (add)", kcal: 80 },
+      ]},
+      { name: "Sides & Shakes", items: [
+        { name: "Fries", kcal: 370 }, { name: "Animal style fries", kcal: 750 },
+        { name: "Chocolate shake", kcal: 590 }, { name: "Vanilla shake", kcal: 580 },
+      ]},
+    ],
+  },
+  "Chili's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Mains", items: [
+        { name: "Oldtimer Burger", kcal: 850 }, { name: "Chicken Crispers (3)", kcal: 660 },
+        { name: "Baby Back Ribs (half)", kcal: 610 }, { name: "Cajun Chicken Pasta", kcal: 1110 },
+        { name: "6oz Sirloin", kcal: 270 }, { name: "Fajitas (chicken)", kcal: 540 },
+      ]},
+      { name: "Apps & Sides", items: [
+        { name: "Southwest Eggrolls (3)", kcal: 590 }, { name: "Fried pickles", kcal: 460 },
+        { name: "Loaded fries", kcal: 1290 }, { name: "Chips & salsa", kcal: 470 },
+        { name: "Side salad", kcal: 150 },
+      ]},
+      { name: "Desserts", items: [
+        { name: "Molten Chocolate Cake", kcal: 1160 }, { name: "Skillet cookie", kcal: 1010 },
+      ]},
+    ],
+  },
+  "Applebee's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Mains", items: [
+        { name: "Classic Cheeseburger", kcal: 1000 }, { name: "Fiesta Lime Chicken", kcal: 1080 },
+        { name: "Bourbon St. Chicken & Shrimp", kcal: 950 }, { name: "Riblets platter", kcal: 800 },
+        { name: "Oriental Chicken Salad", kcal: 1320 }, { name: "6oz Top Sirloin", kcal: 330 },
+      ]},
+      { name: "Apps & Sides", items: [
+        { name: "Mozzarella sticks (4)", kcal: 510 }, { name: "Boneless wings (starter)", kcal: 740 },
+        { name: "Spinach & artichoke dip", kcal: 900 }, { name: "Fries", kcal: 380 },
+      ]},
+    ],
+  },
+  "Buffalo Wild Wings": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Wings & Tenders", items: [
+        { name: "Traditional wings (6)", kcal: 430 }, { name: "Traditional wings (10)", kcal: 720 },
+        { name: "Boneless wings (6)", kcal: 540 }, { name: "Boneless wings (10)", kcal: 900 },
+        { name: "Hand-breaded tenders (4)", kcal: 670 },
+      ]},
+      { name: "Sauce (per order)", items: [
+        { name: "Buffalo (medium)", kcal: 80 }, { name: "Honey BBQ", kcal: 150 },
+        { name: "Parmesan Garlic", kcal: 290 }, { name: "Mango Habanero", kcal: 150 },
+        { name: "Asian Zing", kcal: 120 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Fries (regular)", kcal: 420 }, { name: "Cheese curds", kcal: 750 },
+        { name: "Mozzarella sticks", kcal: 640 }, { name: "Ranch dip", kcal: 220 },
+      ]},
+    ],
+  },
+  "Olive Garden": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Pasta & Mains", items: [
+        { name: "Fettuccine Alfredo", kcal: 1010 }, { name: "Chicken Parmigiana", kcal: 1060 },
+        { name: "Lasagna Classico", kcal: 930 }, { name: "Shrimp Scampi", kcal: 540 },
+        { name: "Spaghetti & meatballs", kcal: 750 }, { name: "Chicken Alfredo", kcal: 1330 },
+      ]},
+      { name: "Starters & Sides", items: [
+        { name: "Breadstick (1)", kcal: 140 }, { name: "Salad w/ dressing (1 serving)", kcal: 150 },
+        { name: "Zuppa Toscana (bowl)", kcal: 320 }, { name: "Fried Mozzarella", kcal: 720 },
+        { name: "Calamari", kcal: 890 },
+      ]},
+    ],
+  },
+  "Texas Roadhouse": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Steaks & Mains", items: [
+        { name: "6oz Sirloin", kcal: 230 }, { name: "12oz Ribeye", kcal: 880 },
+        { name: "Pulled Pork", kcal: 440 }, { name: "Grilled BBQ Chicken", kcal: 280 },
+        { name: "Country Fried Sirloin", kcal: 1030 }, { name: "Fall-off-the-bone Ribs (full)", kcal: 1540 },
+      ]},
+      { name: "Sides & Bread", items: [
+        { name: "Fresh baked roll + butter", kcal: 280 }, { name: "Loaded baked potato", kcal: 770 },
+        { name: "Seasoned rice", kcal: 200 }, { name: "Steak fries", kcal: 420 },
+        { name: "Green beans", kcal: 170 },
+      ]},
+    ],
+  },
+  "IHOP": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Breakfast", items: [
+        { name: "Original buttermilk pancakes (2)", kcal: 350 }, { name: "Stack of pancakes (4)", kcal: 590 },
+        { name: "Belgian waffle", kcal: 590 }, { name: "Breakfast Sampler", kcal: 1180 },
+        { name: "2x2x2 combo", kcal: 690 }, { name: "French toast (2)", kcal: 470 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Hash browns", kcal: 210 }, { name: "Bacon (2)", kcal: 90 },
+        { name: "Sausage (2)", kcal: 180 }, { name: "Eggs (2)", kcal: 180 },
+      ]},
+    ],
+  },
+  "Denny's": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Mains", items: [
+        { name: "Grand Slam (build)", kcal: 790 }, { name: "Moons Over My Hammy", kcal: 840 },
+        { name: "Bacon Cheddar Burger", kcal: 1080 }, { name: "Country Fried Steak", kcal: 880 },
+        { name: "Sticky Bun Pancakes (short)", kcal: 700 },
+      ]},
+      { name: "Sides", items: [
+        { name: "Hash browns", kcal: 200 }, { name: "Seasoned fries", kcal: 430 },
+        { name: "Bacon (4)", kcal: 180 }, { name: "Pancakes (2)", kcal: 340 },
+      ]},
+    ],
+  },
+  "Cheesecake Factory": {
+    formats: [{ name: "Order", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Mains", items: [
+        { name: "Chicken Madeira", kcal: 1500 }, { name: "Louisiana Chicken Pasta", kcal: 2370 },
+        { name: "Factory Burger", kcal: 1330 }, { name: "Orange Chicken", kcal: 1450 },
+        { name: "Chicken Piccata", kcal: 1230 },
+      ]},
+      { name: "Cheesecake (1 slice)", items: [
+        { name: "Original cheesecake", kcal: 830 }, { name: "Oreo Dream Extreme", kcal: 1490 },
+        { name: "Reese's PB Chocolate Cake", kcal: 1330 }, { name: "Strawberry cheesecake", kcal: 760 },
+      ]},
+    ],
+  },
+  "Smoothie King": {
+    formats: [{ name: "20 oz", kcal: 0, mult: 1 }],
+    groups: [
+      { name: "Smoothies", items: [
+        { name: "Angel Food", kcal: 340 }, { name: "Peanut Power Plus Chocolate", kcal: 600 },
+        { name: "Strawberry X-Treme", kcal: 380 }, { name: "Gladiator (vanilla)", kcal: 200 },
+        { name: "Pure Recharge Mango", kcal: 280 }, { name: "Hulk (chocolate)", kcal: 970 },
+      ]},
+    ],
+  },
 };

@@ -26,6 +26,10 @@ const CHAT_INTENTS = [
     answer: "Each day's profit is valued at <strong>that day's actual SOL closing price</strong> (fetched automatically from Coinbase). Today's entry uses the live price until the day ends. Hover any USD amount in the table to see exactly which price was used."
   },
   {
+    keywords: ["calendar", "pnl calendar", "pnl picture", "share image", "screenshot", "post my pnl", "calendar image"],
+    answer: "On the <strong>💵 Money</strong> tab, hit <strong>📅 Calendar</strong> next to the month arrows. It draws the month's profits as a green/red calendar card with totals, green/red day counts, and your best positive streak — toggle <strong>SOL/USD</strong>, flip months, and hit <strong>Save image</strong> for a PNG you can post."
+  },
+  {
     keywords: ["month", "navigate", "previous month", "ytd", "year to date", "arrows", "month total"],
     answer: "Use the <strong>◀ ▶ arrows</strong> on the Money tab to flip between months. Each month shows its total (green = profit, red = loss), the amount swapped, and a <strong>YTD line</strong> — your running total from January 1 of that year through the month you're viewing."
   },

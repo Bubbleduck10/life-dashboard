@@ -261,6 +261,43 @@ td.num, th.num { text-align: right; }
   gap: 14px;
 }
 
+/* PnL calendar modal */
+.cal-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .6);
+  backdrop-filter: blur(3px);
+  z-index: 95;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.cal-box {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, .6);
+}
+
+.cal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.cal-nav { display: inline-flex; align-items: center; gap: 6px; }
+.cal-canvas-wrap { line-height: 0; }
+#cal-canvas { border-radius: 10px; display: block; }
+
 /* daily to-do pinned note */
 .dash-top { display: flex; gap: 20px; align-items: flex-start; }
 .dash-top-main { flex: 1; min-width: 0; }

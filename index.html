@@ -126,6 +126,7 @@
           <button class="btn small ghost" id="month-prev" type="button">◀</button>
           <span id="month-label" style="min-width:140px;text-align:center;display:inline-block"></span>
           <button class="btn small ghost" id="month-next" type="button">▶</button>
+          <button class="btn small" id="cal-open" type="button" style="margin-left:8px" title="Generate a shareable PnL calendar image">📅 Calendar</button>
         </span>
         <span style="text-align:right">
           <span id="ytd-totals" style="display:block;font-size:12px"></span>
@@ -471,6 +472,25 @@
   </section>
 </div>
 
+<div id="cal-modal" class="cal-modal" style="display:none">
+  <div class="cal-box">
+    <div class="cal-bar">
+      <span style="font-weight:700">📅 PnL Calendar</span>
+      <span class="cal-nav">
+        <button class="btn small ghost" id="cal-prev" type="button">◀</button>
+        <span id="cal-month" style="min-width:120px;text-align:center;display:inline-block"></span>
+        <button class="btn small ghost" id="cal-next" type="button">▶</button>
+      </span>
+      <span style="display:flex;gap:6px;align-items:center">
+        <button class="btn small ghost" id="cal-unit" type="button" title="Switch between coin amount and USD">SOL</button>
+        <button class="btn small" id="cal-download" type="button">⬇ Save image</button>
+        <button class="del" id="cal-close" type="button" title="Close">✕</button>
+      </span>
+    </div>
+    <div class="cal-canvas-wrap"><canvas id="cal-canvas"></canvas></div>
+  </div>
+</div>
+
 <a id="credit" href="https://x.com/icyfusion_" target="_blank" rel="noopener">Made by @icyfusion_</a>
 <button id="chat-fab" type="button" title="Questions? Ask Dash">💬</button>
 <div id="chat-panel" style="display:none">
@@ -490,6 +510,7 @@
 <script src="demo.js"></script>
 <script src="app.js"></script>
 <script src="game.js"></script>
+<script src="calendar.js"></script>
 <script src="sync.js"></script>
 <script src="firebase-config.js"></script>
 <script src="account.js"></script>

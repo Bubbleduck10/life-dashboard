@@ -518,7 +518,7 @@ function renderAssets() {
       <td class="num">${value != null ? fmtMoney(value) : "—"}</td>
       <td class="num ${gainCls}">${gain != null ? (gain >= 0 ? "+" : "") + fmtMoney(gain).replace("-$", "-$") + (gainPct != null ? ` (${gainPct >= 0 ? "+" : ""}${gainPct.toFixed(1)}%)` : "") : "—"}</td>
       <td class="num">
-        <button class="del" data-act="price" data-id="${a.id}" title="Set manual price">✎</button>
+        <button class="del" data-act="qty" data-id="${a.id}" title="Edit quantity owned">✎</button>
         <button class="del" data-act="del" data-id="${a.id}" title="Delete">✕</button>
       </td>
     </tr>`;
@@ -531,10 +531,11 @@ function renderAssets() {
       if (!confirm(`Remove ${a.symbol} from your portfolio?`)) return;
       assets = assets.filter(x => x.id !== a.id);
     } else {
-      const input = prompt(`Current price for ${a.symbol} (leave empty to go back to live prices):`, a.manualPrice ?? "");
+      const input = prompt(`How many ${a.symbol} do you own? (0 = watch-only)`, a.qty);
       if (input === null) return;
       const v = parseFloat(input);
-      a.manualPrice = input.trim() === "" || !isFinite(v) ? null : v;
+      if (!isFinite(v) || v < 0) return;
+      a.qty = v;
     }
     store.save("life.assets", assets);
     renderAssets(); renderDashboard();

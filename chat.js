@@ -26,8 +26,12 @@ const CHAT_INTENTS = [
     answer: "Each day's profit is valued at <strong>that day's actual SOL closing price</strong> (fetched automatically from Coinbase). Today's entry uses the live price until the day ends. Hover any USD amount in the table to see exactly which price was used."
   },
   {
-    keywords: ["calendar", "pnl calendar", "pnl picture", "share image", "screenshot", "post my pnl", "calendar image"],
+    keywords: ["calendar", "pnl calendar", "calendar image"],
     answer: "On the <strong>💵 Money</strong> tab, hit <strong>📅 Calendar</strong> next to the month arrows. It draws the month's profits as a green/red calendar card with totals, green/red day counts, and your best positive streak — toggle <strong>SOL/USD</strong>, flip months, and hit <strong>Save image</strong> for a PNG you can post."
+  },
+  {
+    keywords: ["share card", "pnl card", "flex", "post my pnl", "share image", "background image", "background video", "axiom", "brag"],
+    answer: "On the <strong>💵 Money</strong> tab hit <strong>🖼️ Share card</strong>. It makes an Axiom-style card: your PnL big and bold (green for gain, red for loss) over a background — pick a preset, or upload your own <strong>image or video</strong>. Choose daily or monthly, set your username and bottom line (e.g. axiom.trade/icy), then <strong>Save image</strong> (PNG) or <strong>Record video</strong> (.webm) for a video background."
   },
   {
     keywords: ["month", "navigate", "previous month", "ytd", "year to date", "arrows", "month total"],

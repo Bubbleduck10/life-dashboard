@@ -127,6 +127,7 @@
           <span id="month-label" style="min-width:140px;text-align:center;display:inline-block"></span>
           <button class="btn small ghost" id="month-next" type="button">▶</button>
           <button class="btn small" id="cal-open" type="button" style="margin-left:8px" title="Generate a shareable PnL calendar image">📅 Calendar</button>
+          <button class="btn small" id="share-open" type="button" style="margin-left:4px" title="Generate a shareable PnL card (image/video background)">🖼️ Share card</button>
         </span>
         <span style="text-align:right">
           <span id="ytd-totals" style="display:block;font-size:12px"></span>
@@ -491,6 +492,59 @@
   </div>
 </div>
 
+<div id="share-modal" class="cal-modal" style="display:none">
+  <div class="cal-box" style="max-width:920px;width:100%">
+    <div class="cal-bar">
+      <span style="font-weight:700">🖼️ PnL Share Card</span>
+      <button class="del" id="share-close" type="button" title="Close">✕</button>
+    </div>
+    <div class="share-layout">
+      <div class="cal-canvas-wrap"><canvas id="share-canvas"></canvas></div>
+      <div class="share-controls">
+        <label class="field">Period
+          <select id="share-period">
+            <option value="monthly">Monthly (viewed month)</option>
+            <option value="daily">Daily</option>
+          </select>
+        </label>
+        <label class="field" id="share-date-wrap" style="display:none">Date
+          <input id="share-date" type="date">
+        </label>
+        <div class="row" style="gap:8px">
+          <label class="field">Currency
+            <select id="share-coin"><option>SOL</option><option>USDC</option><option>ETH</option><option>BTC</option></select>
+          </label>
+          <label class="field">Show as
+            <select id="share-unit"><option value="coin">Coin</option><option value="usd">USD</option></select>
+          </label>
+        </div>
+        <div class="field">Background
+          <div class="share-bg-presets" id="share-presets"></div>
+          <div class="row" style="gap:8px;margin-top:8px">
+            <label class="btn small ghost" style="cursor:pointer">🖼️ Image
+              <input id="share-img" type="file" accept="image/*" style="display:none">
+            </label>
+            <label class="btn small ghost" style="cursor:pointer">🎬 Video
+              <input id="share-vid" type="file" accept="video/*" style="display:none">
+            </label>
+          </div>
+        </div>
+        <label class="field">Username
+          <input id="share-name" placeholder="@yourname">
+        </label>
+        <label class="field">Bottom line
+          <input id="share-handle" placeholder="axiom.trade/icy">
+        </label>
+        <div class="row" style="gap:8px;margin-top:4px">
+          <button class="btn" id="share-download" type="button">⬇ Save image</button>
+          <button class="btn ghost" id="share-record" type="button" style="display:none">🎬 Record video</button>
+        </div>
+        <p class="statusmsg" id="share-status"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <a id="credit" href="https://x.com/icyfusion_" target="_blank" rel="noopener">Made by @icyfusion_</a>
 <button id="chat-fab" type="button" title="Questions? Ask Dash">💬</button>
 <div id="chat-panel" style="display:none">
@@ -511,6 +565,7 @@
 <script src="app.js"></script>
 <script src="game.js"></script>
 <script src="calendar.js"></script>
+<script src="share.js"></script>
 <script src="sync.js"></script>
 <script src="firebase-config.js"></script>
 <script src="account.js"></script>

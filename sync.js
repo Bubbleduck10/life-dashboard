@@ -3,7 +3,7 @@
 // GitHub account. Strategy: pull on load, debounced push on every change,
 // last-write-wins by timestamp. Token (classic, gist scope) stays in localStorage.
 
-const SYNC_KEYS = ["life.trades", "life.swaps", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos"];
+const SYNC_KEYS = ["life.trades", "life.swaps", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share"];
 const GIST_FILE = "life-dashboard-data.json";
 const GH_API = "https://api.github.com";
 

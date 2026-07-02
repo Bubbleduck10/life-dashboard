@@ -298,6 +298,20 @@ td.num, th.num { text-align: right; }
 .cal-canvas-wrap { line-height: 0; }
 #cal-canvas { border-radius: 10px; display: block; }
 
+/* share card modal */
+.share-layout { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; }
+.share-layout .cal-canvas-wrap { flex: 1; min-width: 300px; }
+#share-canvas { border-radius: 12px; display: block; width: 100%; }
+.share-controls { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+.share-bg-presets { display: flex; gap: 8px; margin-top: 5px; }
+.share-swatch {
+  width: 34px; height: 34px; border-radius: 8px; cursor: pointer;
+  border: 2px solid transparent; transition: transform .12s;
+}
+.share-swatch:hover { transform: scale(1.1); }
+.share-swatch.on { border-color: var(--text); }
+@media (max-width: 720px) { .share-controls { width: 100%; } }
+
 /* daily to-do pinned note */
 .dash-top { display: flex; gap: 20px; align-items: flex-start; }
 .dash-top-main { flex: 1; min-width: 0; }

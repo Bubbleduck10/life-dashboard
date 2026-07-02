@@ -47,23 +47,26 @@ function drawCalendar() {
   const GREEN = "#34d399", RED = "#f87171", MUTED = "#9aa3b2", TEXT = "#e8eaf0";
   const font = (px, w = 400) => `${w} ${px}px "Segoe UI", system-ui, sans-serif`;
 
-  // map day -> trade
+  // map day-of-month -> summed value across every currency logged that day
   const byDay = {};
-  trades.filter(t => t.date.startsWith(viewMonth)).forEach(t => { byDay[+t.date.slice(8, 10)] = t; });
+  trades.filter(t => t.date.startsWith(viewMonth)).forEach(t => {
+    const d = +t.date.slice(8, 10);
+    byDay[d] = (byDay[d] || 0) + calValue(t);
+  });
 
   // stats
   let net = 0, gC = 0, gS = 0, rC = 0, rS = 0, maxAbs = 0;
   for (let d = 1; d <= daysInMonth; d++) {
-    const t = byDay[d]; if (!t) continue;
-    const v = calValue(t); net += v;
+    if (!(d in byDay)) continue;
+    const v = byDay[d]; net += v;
     if (v > 0) { gC++; gS += v; } else if (v < 0) { rC++; rS += v; }
     maxAbs = Math.max(maxAbs, Math.abs(v));
   }
   // best positive streak over trading days, in date order
   let run = 0, best = 0;
   for (let d = 1; d <= daysInMonth; d++) {
-    const t = byDay[d]; if (!t) continue;
-    if (calValue(t) > 0) { run++; best = Math.max(best, run); } else run = 0;
+    if (!(d in byDay)) continue;
+    if (byDay[d] > 0) { run++; best = Math.max(best, run); } else run = 0;
   }
 
   // background
@@ -106,8 +109,7 @@ function drawCalendar() {
     const col = idx % 7, row = Math.floor(idx / 7);
     const x = pad + col * cellW + 3, yy = gridTop + row * cellH + 3;
     const w = cellW - 6, h = cellH - 6;
-    const t = byDay[d];
-    const v = t ? calValue(t) : null;
+    const v = (d in byDay) ? byDay[d] : null;
     // cell background tint
     let fill = "rgba(255,255,255,0.025)", stroke = "rgba(255,255,255,0.06)";
     if (v !== null && v !== 0) {

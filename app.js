@@ -166,8 +166,9 @@ document.getElementById("trade-form").addEventListener("submit", e => {
   const startSol = parseFloat(document.getElementById("trade-start").value);
   const endSol = parseFloat(document.getElementById("trade-end").value);
   if (!isFinite(startSol) || !isFinite(endSol)) return;
-  const existing = trades.find(t => t.date === date);
-  if (existing) { existing.startSol = startSol; existing.endSol = endSol; existing.coin = coin; }
+  // one entry per date+currency, so a day can hold SOL and ETH etc. at once
+  const existing = trades.find(t => t.date === date && tradeCoin(t) === coin);
+  if (existing) { existing.startSol = startSol; existing.endSol = endSol; }
   else trades.push({ id: uid(), date, startSol, endSol, coin });
   store.save("life.trades", trades);
   viewMonth = date.slice(0, 7);
@@ -218,6 +219,16 @@ function sumTrades(list) {
 // "+3.4 SOL" or "+3.4 SOL · −0.2 ETH" for mixed months
 const fmtCoins = coins => Object.entries(coins).map(([c, v]) => fmtAmt(v, c)).join(" · ") || "+0 SOL";
 
+// a day can now hold several currencies — these aggregate a single date
+const tradesOn = date => trades.filter(t => t.date === date);
+const dayNetUsd = date => tradesOn(date).reduce((s, t) => s + (usdForTrade(t) ?? 0), 0);
+function dayCoins(date) {
+  const c = {};
+  for (const t of tradesOn(date)) c[tradeCoin(t)] = (c[tradeCoin(t)] || 0) + tradeProfit(t);
+  return c;
+}
+const tradedDates = () => [...new Set(trades.map(t => t.date))];
+
 const monthTotals = monthPrefix => sumTrades(trades.filter(t => t.date.startsWith(monthPrefix)));
 
 function renderMoney() {
@@ -226,15 +237,16 @@ function renderMoney() {
   const t = todayStr();
 
   // --- cards ---
-  const todayTrade = trades.find(x => x.date === t);
+  const todaysTrades = tradesOn(t);
   const todayEl = document.getElementById("money-today");
   const todaySub = document.getElementById("money-today-sub");
-  if (todayTrade) {
-    const pSol = tradeProfit(todayTrade);
-    const tUsd = usdForTrade(todayTrade);
-    todayEl.textContent = tUsd != null ? fmtMoney(tUsd) : "—";
-    todayEl.className = "big " + (pSol > 0 ? "up" : pSol < 0 ? "down" : "");
-    todaySub.textContent = fmtAmt(pSol, tradeCoin(todayTrade)) + ` (${todayTrade.startSol} → ${todayTrade.endSol})`;
+  if (todaysTrades.length) {
+    const usd = dayNetUsd(t);
+    const coins = dayCoins(t);
+    const solSign = Object.values(coins).reduce((s, v) => s + v, 0);
+    todayEl.textContent = usd ? fmtMoney(usd) : fmtCoins(coins);
+    todayEl.className = "big " + ((usd || solSign) > 0 ? "up" : (usd || solSign) < 0 ? "down" : "");
+    todaySub.textContent = fmtCoins(coins) + (todaysTrades.length > 1 ? ` · ${todaysTrades.length} currencies` : "");
   } else {
     todayEl.textContent = "$0.00"; todayEl.className = "big";
     todaySub.textContent = "no entry yet — log today below";
@@ -301,7 +313,7 @@ function renderMoney() {
       <td class="num ${cls}">${fmtAmt(pSol, coin)}</td>
       <td class="num ${cls}" title="${priceNote}">${usd != null ? fmtMoney(usd) : "—"}</td>
       <td class="num" style="white-space:nowrap">
-        <button class="del" data-act="end" data-id="${x.id}" title="Update ending balance (day not done yet?)">✎</button>
+        <button class="del" data-act="edit" data-id="${x.id}" title="Edit starting / ending balance">✎</button>
         <button class="del note-btn ${x.note ? "has-note" : ""}" data-act="note" data-id="${x.id}" title="${x.note ? "Edit note" : "Add note"}">📝</button>
         <button class="del" data-act="del" data-id="${x.id}" title="Delete">✕</button>
       </td>
@@ -318,12 +330,14 @@ function renderMoney() {
   tbody.querySelectorAll(".del").forEach(b => b.addEventListener("click", () => {
     const tr = trades.find(x => x.id === b.dataset.id);
     if (!tr) return;
-    if (b.dataset.act === "end") {
-      const input = prompt(`Ending balance for ${tr.date} (${tradeCoin(tr)}) — update anytime, the day doesn't have to be over:`, tr.endSol);
-      if (input === null) return;
-      const v = parseFloat(input);
-      if (!isFinite(v)) return;
-      tr.endSol = v;
+    if (b.dataset.act === "edit") {
+      const coin = tradeCoin(tr);
+      const s = prompt(`Starting ${coin} balance for ${tr.date}:`, tr.startSol);
+      if (s === null) return;
+      const sv = parseFloat(s);
+      if (isFinite(sv)) tr.startSol = sv;
+      const e = prompt(`Ending ${coin} balance for ${tr.date} (update anytime — the day doesn't have to be over):`, tr.endSol);
+      if (e !== null) { const ev = parseFloat(e); if (isFinite(ev)) tr.endSol = ev; }
       store.save("life.trades", trades);
     } else if (b.dataset.act === "note") {
       const input = prompt(`Note for ${tr.date}:`, tr.note || "");
@@ -966,11 +980,10 @@ function renderDashboard() {
   const t = todayStr();
 
   const sp = solPriceInfo();
-  const todayTrade = trades.find(x => x.date === t);
-  const pSol = todayTrade ? tradeProfit(todayTrade) : 0;
-  setMoneyStat("dash-money", todayTrade ? (usdForTrade(todayTrade) ?? 0) : 0);
-  document.getElementById("dash-money-sub").textContent = todayTrade
-    ? fmtAmt(pSol, tradeCoin(todayTrade)) + " trading today" : "no trading entry yet";
+  const todaysTrades = tradesOn(t);
+  setMoneyStat("dash-money", todaysTrades.length ? dayNetUsd(t) : 0);
+  document.getElementById("dash-money-sub").textContent = todaysTrades.length
+    ? fmtCoins(dayCoins(t)) + " trading today" : "no trading entry yet";
 
   const pt = portfolioTotals();
   document.getElementById("dash-port").textContent = pt.priced ? fmtMoney(pt.value) : "—";
@@ -995,17 +1008,19 @@ function renderDashboard() {
   renderGoalList(document.getElementById("dash-goal-list"), false);
   renderGoalList(document.getElementById("money-goal-list"), true);
 
-  // daily profits: today's entry only
-  document.getElementById("dash-profit-rows").innerHTML = todayTrade ? (() => {
-    const pSol = tradeProfit(todayTrade);
-    const usd = usdForTrade(todayTrade);
-    const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
-    return `<tr>
-      <td>Today <span class="muted">(${todayTrade.startSol} → ${todayTrade.endSol})</span></td>
-      <td class="num ${cls}">${fmtAmt(pSol, tradeCoin(todayTrade))}</td>
+  // daily profits: today's entries (one row per currency)
+  document.getElementById("dash-profit-rows").innerHTML = todaysTrades.length
+    ? todaysTrades.map(x => {
+        const pSol = tradeProfit(x);
+        const usd = usdForTrade(x);
+        const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
+        return `<tr>
+      <td>Today <span class="muted">(${tradeCoin(x)}: ${x.startSol} → ${x.endSol})</span></td>
+      <td class="num ${cls}">${fmtAmt(pSol, tradeCoin(x))}</td>
       <td class="num ${cls}">${usd != null ? fmtMoney(usd) : "—"}</td>
     </tr>`;
-  })() : `<tr><td colspan="3" class="empty">No entry for today yet — log it on the Money tab.</td></tr>`;
+      }).join("")
+    : `<tr><td colspan="3" class="empty">No entry for today yet — log it on the Money tab.</td></tr>`;
 
   // daily food progress
   const todaysFood = food.filter(f => f.date === t);

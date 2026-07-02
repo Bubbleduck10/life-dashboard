@@ -7,15 +7,15 @@ const CHAT_INTENTS = [
   },
   {
     keywords: ["currency", "usdc", "different coin", "change coin", "eth instead", "btc instead", "other coin", "trade eth", "trade btc"],
-    answer: "The <strong>Currency</strong> selector in the Log-a-trading-day form lets each day be tracked in <strong>SOL, USDC, ETH, or BTC</strong>. USDC counts as $1 flat; ETH and BTC get live prices and historical day-of closes just like SOL. Mixed months show a per-coin breakdown plus the combined USD total."
+    answer: "The <strong>Currency</strong> selector in the Log-a-trading-day form lets you track <strong>SOL, USDC, ETH, or BTC</strong>. You can log <strong>several currencies on the same day</strong> — just log the date again with a different coin and both entries stack (re-logging the same date + coin overwrites it). USDC counts as $1 flat; ETH and BTC use live and historical day-of prices like SOL. The day's card, calendar, and totals combine them into one USD figure."
   },
   {
     keywords: ["note", "notes", "journal", "write on a day"],
     answer: "Every day in the Money table has a <strong>📝 button</strong> next to the ✕. Click it to add a note (like a mini trading journal) — it shows under that day, and the icon highlights on days that have one. Click again to edit, clear the text to remove."
   },
   {
-    keywords: ["edit", "update ending", "change ending", "day not over", "not complete", "fix a day", "wrong number", "pencil"],
-    answer: "Click the <strong>✎ pencil</strong> on any day in the Money table to update its ending balance — handy when your day isn't finished and the balance is still moving. Profit and USD recalculate instantly. You can also re-log the same date from the form to replace the whole entry, or 📝 to edit its note."
+    keywords: ["edit", "update ending", "update starting", "change ending", "change starting", "day not over", "not complete", "fix a day", "wrong number", "pencil"],
+    answer: "Click the <strong>✎ pencil</strong> on any day in the Money table to edit its <strong>starting and ending balance</strong> — handy when your day isn't finished and the balance is still moving. Profit and USD recalculate instantly. Use 📝 to edit that day's note."
   },
   {
     keywords: ["swap", "swaps", "swapped", "stables", "sold sol", "bought sol"],

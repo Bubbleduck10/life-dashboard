@@ -38,11 +38,12 @@ function foodDayTotals() {
   return days;
 }
 
+// a day is "green" by its net USD across all currencies logged that day
 function greenStreak() {
-  const sorted = [...trades].sort((a, b) => b.date.localeCompare(a.date));
+  const dates = tradedDates().sort((a, b) => b.localeCompare(a));
   let n = 0;
-  for (const tr of sorted) {
-    if (tradeProfit(tr) > 0) n++;
+  for (const d of dates) {
+    if (dayNetUsd(d) > 0) n++;
     else break;
   }
   return n;
@@ -75,13 +76,14 @@ function weekRange(offsetWeeks = 0) {
 
 function weekStats(start, end, days) {
   const wt = trades.filter(t => t.date >= start && t.date <= end);
+  const dates = [...new Set(wt.map(t => t.date))]; // distinct trading days
   let foodDays = 0, under = 0;
   for (const d in days) {
     if (d >= start && d <= end) { foodDays++; if (days[d] <= settings.calGoal) under++; }
   }
   return {
-    logged: wt.length,
-    green: wt.filter(t => tradeProfit(t) > 0).length,
+    logged: dates.length,
+    green: dates.filter(d => dayNetUsd(d) > 0).length,
     net: wt.reduce((s, t) => s + (usdForTrade(t) ?? 0), 0), // USD so mixed coins compare fairly
     foodDays, under,
   };
@@ -127,9 +129,9 @@ const ACHIEVEMENTS = [
   { id: "whale-day", icon: "🐋", name: "Whale Move", desc: "+100 SOL in a single day", test: () => bestDay() >= 100 },
   { id: "monster-month", icon: "👹", name: "Monster Month", desc: "+1,000 SOL in one month", test: () => bestMonthSol() >= 1000 },
   { id: "comeback", icon: "🦅", name: "Comeback Kid", desc: "Green day right after losing 50+ SOL", test: testComeback },
-  { id: "log30", icon: "📒", name: "Iron Logger", desc: "Log 30 days total", test: () => trades.length >= 30 },
-  { id: "log100", icon: "💯", name: "Centurion", desc: "Log 100 days total", test: () => trades.length >= 100 },
-  { id: "log365", icon: "🗓️", name: "Year Grinder", desc: "Log 365 days total", test: () => trades.length >= 365 },
+  { id: "log30", icon: "📒", name: "Iron Logger", desc: "Log 30 days total", test: () => tradedDates().length >= 30 },
+  { id: "log100", icon: "💯", name: "Centurion", desc: "Log 100 days total", test: () => tradedDates().length >= 100 },
+  { id: "log365", icon: "🗓️", name: "Year Grinder", desc: "Log 365 days total", test: () => tradedDates().length >= 365 },
   { id: "swap10", icon: "🔄", name: "Swap Master", desc: "Log 10 swaps", test: () => swaps.length >= 10 },
   { id: "swap100k", icon: "💰", name: "Big Mover", desc: "$100k+ total swapped", test: () => swaps.reduce((s, x) => s + x.usd, 0) >= 100000 },
   { id: "first-meal", icon: "🍽️", name: "First Bite", desc: "Log your first meal", test: () => food.length >= 1 },
@@ -141,10 +143,10 @@ const ACHIEVEMENTS = [
 ];
 
 function maxGreenRun() {
-  const sorted = [...trades].sort((a, b) => a.date.localeCompare(b.date));
+  const dates = tradedDates().sort();
   let run = 0, best = 0;
-  for (const tr of sorted) {
-    run = tradeProfit(tr) > 0 ? run + 1 : 0;
+  for (const d of dates) {
+    run = dayNetUsd(d) > 0 ? run + 1 : 0;
     best = Math.max(best, run);
   }
   return best;
@@ -254,11 +256,11 @@ function renderGame() {
 
   // arcade: daily quests
   const t = todayStr();
-  const todayTrade = trades.find(x => x.date === t);
+  const loggedToday = tradesOn(t).length > 0;
   const todayCals = days[t];
   const quests = [
-    { name: "Log today's trading day", done: !!todayTrade, xp: 10 },
-    { name: "End the day green", done: !!todayTrade && tradeProfit(todayTrade) > 0, xp: 15 },
+    { name: "Log today's trading day", done: loggedToday, xp: 10 },
+    { name: "End the day green", done: loggedToday && dayNetUsd(t) > 0, xp: 15 },
     { name: "Log your meals", done: todayCals != null, xp: 5 },
     { name: "Stay under your calorie goal", done: todayCals != null && todayCals <= settings.calGoal, xp: 10 },
   ];

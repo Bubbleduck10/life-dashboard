@@ -874,6 +874,7 @@ function goalHtml(g, compact) {
       <input type="number" step="any" placeholder="Add progress…" class="goal-add">
       <button class="btn small goal-add-btn">Add</button>
       <button class="btn small ghost goal-set-btn">Set total</button>
+      <button class="btn small ghost goal-reset-btn" title="Reset progress to 0">↺ Reset</button>
       <button class="del goal-del" title="Delete goal">✕</button>
     </div>`}
   </div>`;
@@ -897,6 +898,13 @@ function renderGoalList(wrap, compact) {
     };
     el.querySelector(".goal-add-btn").addEventListener("click", () => apply(false));
     el.querySelector(".goal-set-btn").addEventListener("click", () => apply(true));
+    el.querySelector(".goal-reset-btn").addEventListener("click", () => {
+      if (g.current === 0) return;
+      if (!confirm(`Reset progress on "${g.title}" back to 0?`)) return;
+      g.current = 0;
+      store.save("life.goals", goals);
+      renderGoals(); renderDashboard();
+    });
     input.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); apply(false); } });
     el.querySelector(".goal-del").addEventListener("click", () => {
       if (!confirm(`Delete goal "${g.title}"?`)) return;

@@ -16,7 +16,7 @@ let shareState = {
   period: "monthly", date: todayStr(), coin: "SOL", unit: "coin",
   bg: { type: "gradient", key: "sky" },
 };
-let shareImg = null, shareVideo = null, shareRAF = null, shareRecording = false;
+let shareImg = null, shareVideo = null, shareRAF = null, shareRecording = false, shareZoom = 0;
 let sharePrefs = store.load("life.share", { name: "", handle: "axiom.trade/icy" });
 
 function sharePeriodData() {
@@ -66,12 +66,14 @@ function shareFmt(v, usd) {
 
 function drawShareBackground(ctx, W, H) {
   if (shareState.bg.type === "image" && shareImg) {
-    drawCover(ctx, shareImg, W, H);
+    drawCover(ctx, shareImg, W, H, shareZoom);
   } else if (shareState.bg.type === "video" && shareVideo && shareVideo.readyState >= 2) {
-    drawCover(ctx, shareVideo, W, H);
+    drawCover(ctx, shareVideo, W, H, 0);
   } else {
     const [c0, c1] = SHARE_PRESETS[shareState.bg.key] || SHARE_PRESETS.sky;
-    const g = ctx.createLinearGradient(0, 0, W, H);
+    // slow drift on the gradient angle so a static-background clip still moves
+    const a = shareZoom * Math.PI;
+    const g = ctx.createLinearGradient(0, 0, W * Math.cos(a * 0.15 + 0.2), H);
     g.addColorStop(0, c0); g.addColorStop(1, c1);
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   }
@@ -86,11 +88,11 @@ function drawShareBackground(ctx, W, H) {
   ctx.fillStyle = bottom; ctx.fillRect(0, 0, W, H);
 }
 
-function drawCover(ctx, src, W, H) {
+function drawCover(ctx, src, W, H, zoom = 0) {
   const sw = src.videoWidth || src.naturalWidth || src.width;
   const sh = src.videoHeight || src.naturalHeight || src.height;
   if (!sw || !sh) return;
-  const scale = Math.max(W / sw, H / sh);
+  const scale = Math.max(W / sw, H / sh) * (1 + 0.07 * zoom); // slow Ken-Burns zoom
   const dw = sw * scale, dh = sh * scale;
   ctx.drawImage(src, (W - dw) / 2, (H - dh) / 2, dw, dh);
 }
@@ -164,8 +166,6 @@ function drawShareCard() {
   ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.font = '600 30px "Segoe UI", system-ui, sans-serif';
   ctx.fillText("🌐 " + (sharePrefs.handle || "axiom.trade/icy"), 60, H - 48);
   noShadow();
-
-  document.getElementById("share-record").style.display = shareState.bg.type === "video" && shareVideo ? "" : "none";
 }
 
 function roundRect(ctx, x, y, w, h, r) {
@@ -262,15 +262,22 @@ document.getElementById("share-download").addEventListener("click", () => {
 });
 
 document.getElementById("share-record").addEventListener("click", async () => {
-  if (shareRecording || !shareVideo) return;
+  if (shareRecording) return;
   const canvas = document.getElementById("share-canvas");
+  const status = document.getElementById("share-status");
+  const btn = document.getElementById("share-record");
   if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
-    document.getElementById("share-status").textContent = "Your browser can't record video — use Save image instead.";
-    return;
+    status.textContent = "This browser can't record video — use Save image instead."; return;
   }
-  const type = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(t => MediaRecorder.isTypeSupported(t)) || "video/webm";
+  const type = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(t => MediaRecorder.isTypeSupported(t));
+  if (!type) { status.textContent = "Video recording isn't supported here — use Save image."; return; }
+
+  const hasVideo = shareState.bg.type === "video" && shareVideo;
   shareRecording = true;
-  document.getElementById("share-status").textContent = "Recording…";
+  stopShareLoop();
+  btn.textContent = "● Recording…"; btn.disabled = true;
+  status.textContent = "";
+
   const stream = canvas.captureStream(30);
   const rec = new MediaRecorder(stream, { mimeType: type });
   const chunks = [];
@@ -280,13 +287,24 @@ document.getElementById("share-record").addEventListener("click", async () => {
     a.href = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
     a.download = `pnl-${shareState.period}-${shareState.period === "daily" ? shareState.date : viewMonth}.webm`;
     a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-    shareRecording = false;
-    document.getElementById("share-status").textContent = "Saved a .webm clip.";
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    shareRecording = false; shareZoom = 0;
+    btn.textContent = "🎬 Save video"; btn.disabled = false;
+    if (hasVideo) { shareLoop(); } else drawShareCard();
+    status.textContent = "Saved a .webm clip. (If a site won't accept .webm, convert it to MP4.)";
   };
-  shareVideo.currentTime = 0; await shareVideo.play();
-  if (!shareRAF) shareLoop();
+
+  const durMs = hasVideo
+    ? Math.min(shareVideo.duration && isFinite(shareVideo.duration) ? shareVideo.duration : 6, 10) * 1000
+    : 4000;
+  if (hasVideo) { shareVideo.currentTime = 0; try { await shareVideo.play(); } catch {} }
+
   rec.start();
-  const dur = Math.min(shareVideo.duration && isFinite(shareVideo.duration) ? shareVideo.duration : 6, 8) * 1000;
-  setTimeout(() => rec.stop(), dur);
+  const t0 = performance.now();
+  // timer-driven (not rAF) so it still finishes if the tab loses focus
+  const drawTimer = setInterval(() => {
+    if (!hasVideo) shareZoom = Math.min(1, (performance.now() - t0) / durMs);
+    drawShareCard();
+  }, 1000 / 30);
+  setTimeout(() => { clearInterval(drawTimer); if (hasVideo) shareVideo.pause(); try { rec.stop(); } catch {} }, durMs);
 });

@@ -31,7 +31,7 @@ const CHAT_INTENTS = [
   },
   {
     keywords: ["share card", "pnl card", "flex", "post my pnl", "share image", "background image", "background video", "axiom", "brag"],
-    answer: "On the <strong>💵 Money</strong> tab hit <strong>🖼️ Share card</strong>. It makes an Axiom-style card: your PnL big and bold (green for gain, red for loss) over a background — pick a preset, or upload your own <strong>image or video</strong>. Choose daily or monthly, set your username and bottom line (e.g. axiom.trade/icy), then <strong>Save image</strong> (PNG) or <strong>Record video</strong> (.webm) for a video background."
+    answer: "On the <strong>💵 Money</strong> tab hit <strong>🖼️ Share card</strong>. It makes an Axiom-style card: your PnL big and bold (green for gain, red for loss) over a background — pick a preset, or upload your own <strong>image or video</strong>. Choose daily or monthly, a single currency or <strong>All (USD)</strong> to combine SOL, ETH and USDC into one dollar figure, set your username and bottom line (e.g. axiom.trade/icy), then <strong>Save image</strong> (PNG) or <strong>Record video</strong> (.webm) for a video background."
   },
   {
     keywords: ["month", "navigate", "previous month", "ytd", "year to date", "arrows", "month total"],

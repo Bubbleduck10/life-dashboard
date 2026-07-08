@@ -21,18 +21,31 @@ let sharePrefs = store.load("life.share", { name: "", handle: "axiom.trade/icy" 
 
 function sharePeriodData() {
   const coin = shareState.coin;
-  let entries;
-  if (shareState.period === "daily") {
-    entries = trades.filter(t => t.date === shareState.date && tradeCoin(t) === coin);
-  } else {
-    entries = trades.filter(t => t.date.startsWith(viewMonth) && tradeCoin(t) === coin)
-      .sort((a, b) => a.date.localeCompare(b.date));
-  }
+  const inPeriod = t => shareState.period === "daily" ? t.date === shareState.date : t.date.startsWith(viewMonth);
   const label = shareState.period === "daily"
     ? new Date(shareState.date + "T12:00").toLocaleDateString(undefined, { weekday: "short", month: "long", day: "numeric", year: "numeric" })
     : new Date(viewMonth + "-01T12:00").toLocaleDateString(undefined, { month: "long", year: "numeric" });
-  if (!entries.length) return { label, coin, empty: true };
 
+  // combined across every currency → everything valued in USD
+  if (coin === "ALL") {
+    const entries = trades.filter(inPeriod);
+    if (!entries.length) return { label, coin, empty: true };
+    const coins = [...new Set(entries.map(tradeCoin))];
+    let startUSD = 0, endUSD = 0;
+    const breakdown = {};
+    for (const c of coins) {
+      const ce = entries.filter(t => tradeCoin(t) === c).sort((a, b) => a.date.localeCompare(b.date));
+      startUSD += ce[0].startSol * (histPrice(c, ce[0].date) || 0);
+      endUSD += ce[ce.length - 1].endSol * (histPrice(c, ce[ce.length - 1].date) || 0);
+      breakdown[c] = ce.reduce((s, t) => s + (t.endSol - t.startSol), 0);
+    }
+    const profit = entries.reduce((s, t) => s + (usdForTrade(t) ?? 0), 0);
+    const pct = startUSD ? (profit / startUSD) * 100 : null;
+    return { label, coin: "ALL", usd: true, all: true, start: startUSD, end: endUSD, profit, pct, breakdown };
+  }
+
+  const entries = trades.filter(t => inPeriod(t) && tradeCoin(t) === coin).sort((a, b) => a.date.localeCompare(b.date));
+  if (!entries.length) return { label, coin, empty: true };
   const start = entries[0].startSol;
   const end = entries[entries.length - 1].endSol;
   const profit = end - start;
@@ -107,8 +120,10 @@ function drawShareCard() {
     ctx.fillText("No trades this " + shareState.period.replace("ly", ""), 60, 280);
   } else {
     // big PnL pill
-    const glyph = shareState.unit === "usd" ? "$" : (COIN_GLYPH[d.coin] || d.coin);
-    const bigText = `${shareState.unit === "usd" ? "" : glyph + " "}${(d.profit >= 0 ? "+" : "") + shareFmt(d.profit, d.usd)}`;
+    const usd = d.usd;
+    const fmtBal = v => usd ? "$" + v.toLocaleString(undefined, { maximumFractionDigits: 2 }) : (COIN_GLYPH[d.coin] || "") + " " + v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    const glyph = usd ? "" : (COIN_GLYPH[d.coin] || d.coin) + " ";
+    const bigText = `${glyph}${(d.profit >= 0 ? "+" : "") + shareFmt(d.profit, usd)}`;
     ctx.font = '800 96px "Segoe UI", system-ui, sans-serif';
     const tw = ctx.measureText(bigText).width;
     const pillX = 50, pillY = 190, pillH = 128, pillW = tw + 72;
@@ -122,8 +137,8 @@ function drawShareCard() {
     shadow();
     const rows = [
       ["PNL", d.pct == null ? "—" : (d.pct >= 0 ? "+" : "") + d.pct.toFixed(0) + "%", accent],
-      ["Start Balance", shareState.unit === "usd" ? "$" + d.start.toLocaleString(undefined, { maximumFractionDigits: 2 }) : (COIN_GLYPH[d.coin] || "") + " " + d.start.toLocaleString(undefined, { maximumFractionDigits: 2 }), WHITE],
-      ["End Balance", shareState.unit === "usd" ? "$" + d.end.toLocaleString(undefined, { maximumFractionDigits: 2 }) : (COIN_GLYPH[d.coin] || "") + " " + d.end.toLocaleString(undefined, { maximumFractionDigits: 2 }), WHITE],
+      ["Start Balance", fmtBal(d.start), WHITE],
+      ["End Balance", fmtBal(d.end), WHITE],
     ];
     let ry = 430;
     for (const [lab, val, col] of rows) {
@@ -132,6 +147,13 @@ function drawShareCard() {
       ctx.fillStyle = col; ctx.font = '700 38px "Segoe UI", system-ui, sans-serif';
       ctx.fillText(val, 430, ry);
       ry += 60;
+    }
+    // per-currency breakdown when combining All
+    if (d.all) {
+      const parts = Object.entries(d.breakdown)
+        .map(([c, v]) => `${c} ${v >= 0 ? "+" : ""}${v.toLocaleString(undefined, { maximumFractionDigits: 2 })}`).join("    ");
+      ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.font = '600 27px "Segoe UI", system-ui, sans-serif';
+      ctx.fillText(parts, 60, ry + 6);
     }
   }
 
@@ -171,11 +193,20 @@ function renderSharePresets() {
   }));
 }
 
+function syncUnitEnabled() {
+  document.getElementById("share-unit").disabled = shareState.coin === "ALL";
+}
+
 function openShare() {
   document.getElementById("share-modal").style.display = "flex";
   document.getElementById("share-name").value = sharePrefs.name;
   document.getElementById("share-handle").value = sharePrefs.handle;
   document.getElementById("share-date").value = shareState.date;
+  document.getElementById("share-coin").value = shareState.coin;
+  document.getElementById("share-unit").value = shareState.unit;
+  document.getElementById("share-period").value = shareState.period;
+  document.getElementById("share-date-wrap").style.display = shareState.period === "daily" ? "" : "none";
+  syncUnitEnabled();
   renderSharePresets();
   drawShareCard();
 }
@@ -191,7 +222,7 @@ document.getElementById("share-period").addEventListener("change", e => {
   drawShareCard();
 });
 document.getElementById("share-date").addEventListener("change", e => { shareState.date = e.target.value; drawShareCard(); });
-document.getElementById("share-coin").addEventListener("change", e => { shareState.coin = e.target.value; drawShareCard(); });
+document.getElementById("share-coin").addEventListener("change", e => { shareState.coin = e.target.value; syncUnitEnabled(); drawShareCard(); });
 document.getElementById("share-unit").addEventListener("change", e => { shareState.unit = e.target.value; drawShareCard(); });
 
 function savePrefs() {

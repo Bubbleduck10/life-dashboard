@@ -189,7 +189,7 @@ function renderSharePresets() {
        style="background:linear-gradient(135deg,${SHARE_PRESETS[k][0]},${SHARE_PRESETS[k][1]})"></span>`).join("");
   box.querySelectorAll("[data-preset]").forEach(el => el.addEventListener("click", () => {
     shareState.bg = { type: "gradient", key: el.dataset.preset };
-    stopShareLoop(); renderSharePresets(); drawShareCard();
+    stopShareLoop(); renderSharePresets(); updateVideoOpts(); drawShareCard();
   }));
 }
 
@@ -208,9 +208,14 @@ function openShare() {
   document.getElementById("share-date-wrap").style.display = shareState.period === "daily" ? "" : "none";
   syncUnitEnabled();
   renderSharePresets();
+  updateVideoOpts();
   drawShareCard();
 }
-function closeShare() { stopShareLoop(); document.getElementById("share-modal").style.display = "none"; }
+function closeShare() {
+  stopShareLoop();
+  if (shareVideo && !shareRecording) shareVideo.muted = true;
+  document.getElementById("share-modal").style.display = "none";
+}
 
 document.getElementById("share-open").addEventListener("click", openShare);
 document.getElementById("share-close").addEventListener("click", closeShare);
@@ -237,17 +242,33 @@ document.getElementById("share-img").addEventListener("change", e => {
   const file = e.target.files[0]; e.target.value = "";
   if (!file) return;
   const img = new Image();
-  img.onload = () => { shareImg = img; shareState.bg = { type: "image" }; stopShareLoop(); renderSharePresets(); drawShareCard(); };
+  img.onload = () => { shareImg = img; shareState.bg = { type: "image" }; stopShareLoop(); renderSharePresets(); updateVideoOpts(); drawShareCard(); };
   img.src = URL.createObjectURL(file);
 });
+
+function updateVideoOpts() {
+  const on = shareState.bg.type === "video" && shareVideo;
+  document.getElementById("share-vid-opts").style.display = on ? "" : "none";
+}
 
 document.getElementById("share-vid").addEventListener("change", e => {
   const file = e.target.files[0]; e.target.value = "";
   if (!file) return;
   const v = document.createElement("video");
   v.src = URL.createObjectURL(file);
-  v.muted = true; v.loop = true; v.playsInline = true;
-  v.onloadeddata = () => { shareVideo = v; shareState.bg = { type: "video" }; v.play(); renderSharePresets(); stopShareLoop(); shareLoop(); };
+  v.muted = true; v.loop = true; v.playsInline = true; // muted so the preview can autoplay
+  v.onloadeddata = () => {
+    shareVideo = v; shareState.bg = { type: "video" }; v.play();
+    document.getElementById("share-preview-sound").textContent = "🔇 Hear preview";
+    renderSharePresets(); updateVideoOpts(); stopShareLoop(); shareLoop();
+  };
+});
+
+document.getElementById("share-preview-sound").addEventListener("click", () => {
+  if (!shareVideo) return;
+  shareVideo.muted = !shareVideo.muted;
+  if (!shareVideo.muted) shareVideo.play().catch(() => {});
+  document.getElementById("share-preview-sound").textContent = shareVideo.muted ? "🔇 Hear preview" : "🔊 Mute preview";
 });
 
 document.getElementById("share-download").addEventListener("click", () => {
@@ -269,17 +290,32 @@ document.getElementById("share-record").addEventListener("click", async () => {
   if (!canvas.captureStream || typeof MediaRecorder === "undefined") {
     status.textContent = "This browser can't record video — use Save image instead."; return;
   }
-  const type = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"].find(t => MediaRecorder.isTypeSupported(t));
+  const hasVideo = shareState.bg.type === "video" && shareVideo;
+  const wantSound = hasVideo && document.getElementById("share-sound").checked;
+  const type = [
+    ...(wantSound ? ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus"] : []),
+    "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm",
+  ].find(t => MediaRecorder.isTypeSupported(t));
   if (!type) { status.textContent = "Video recording isn't supported here — use Save image."; return; }
 
-  const hasVideo = shareState.bg.type === "video" && shareVideo;
   shareRecording = true;
   stopShareLoop();
   btn.textContent = "● Recording…"; btn.disabled = true;
   status.textContent = "";
 
-  const stream = canvas.captureStream(30);
-  const rec = new MediaRecorder(stream, { mimeType: type });
+  // canvas video track + (optionally) the uploaded video's audio track
+  const recStream = new MediaStream(canvas.captureStream(30).getVideoTracks());
+  const wasMuted = hasVideo ? shareVideo.muted : true;
+  if (wantSound) {
+    try {
+      shareVideo.muted = false; shareVideo.volume = 1;
+      const cap = shareVideo.captureStream ? shareVideo.captureStream() : (shareVideo.mozCaptureStream ? shareVideo.mozCaptureStream() : null);
+      const at = cap && cap.getAudioTracks()[0];
+      if (at) recStream.addTrack(at);
+    } catch { /* fall back to silent video */ }
+  }
+
+  const rec = new MediaRecorder(recStream, { mimeType: type });
   const chunks = [];
   rec.ondataavailable = e => e.data.size && chunks.push(e.data);
   rec.onstop = () => {
@@ -289,9 +325,10 @@ document.getElementById("share-record").addEventListener("click", async () => {
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1500);
     shareRecording = false; shareZoom = 0;
+    if (hasVideo) shareVideo.muted = wasMuted; // restore preview mute state
     btn.textContent = "🎬 Save video"; btn.disabled = false;
     if (hasVideo) { shareLoop(); } else drawShareCard();
-    status.textContent = "Saved a .webm clip. (If a site won't accept .webm, convert it to MP4.)";
+    status.textContent = "Saved a .webm clip" + (wantSound ? " with sound" : "") + ". (If a site won't accept .webm, convert it to MP4.)";
   };
 
   const durMs = hasVideo

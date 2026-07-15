@@ -78,6 +78,15 @@
       </div>
     </div>
     <div class="panel">
+      <h2><span>✅ Daily habits</span>
+        <span style="display:flex;gap:10px;align-items:center">
+          <span class="muted" id="dash-habits-label" style="font-size:12px;font-weight:400"></span>
+          <button class="btn small ghost" id="dash-habits-open" type="button">Open</button>
+        </span>
+      </h2>
+      <div id="dash-habits"></div>
+    </div>
+    <div class="panel">
       <h2><span>🗓️ Weekly challenges</span><span class="muted" id="dash-weekly-label" style="font-size:12px;font-weight:400"></span></h2>
       <div id="dash-weekly"></div>
     </div>
@@ -550,6 +559,24 @@
   </div>
 </div>
 
+<div id="habits-modal" class="cal-modal" style="display:none">
+  <div class="cal-box" style="max-width:460px;width:100%">
+    <div class="cal-bar">
+      <span style="font-weight:700">✅ Daily Habits <span class="muted" id="habits-date" style="font-weight:400;font-size:12px"></span></span>
+      <button class="del" id="habits-close" type="button" title="Close">✕</button>
+    </div>
+    <div id="habits-list"></div>
+    <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+      <div class="habits-suggest" id="habits-suggest"></div>
+      <form class="row" id="habit-form" style="margin-top:10px">
+        <input id="habit-icon" maxlength="2" value="✅" title="Emoji" style="width:54px;text-align:center;font-size:18px">
+        <input id="habit-name" placeholder="New habit… (e.g. Gym, Water)" style="flex:1;min-width:120px">
+        <button class="btn small" type="submit">Add</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <a id="credit" href="https://x.com/icyfusion_" target="_blank" rel="noopener">Made by @icyfusion_</a>
 <button id="chat-fab" type="button" title="Questions? Ask Dash">💬</button>
 <div id="chat-panel" style="display:none">
@@ -568,6 +595,7 @@
 <script src="foods.js"></script>
 <script src="demo.js"></script>
 <script src="app.js"></script>
+<script src="habits.js"></script>
 <script src="game.js"></script>
 <script src="calendar.js"></script>
 <script src="share.js"></script>

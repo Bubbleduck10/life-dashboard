@@ -140,6 +140,7 @@ const ACHIEVEMENTS = [
   { id: "builder", icon: "🌯", name: "Master Builder", desc: "Log a meal with the meal builder", test: () => food.some(f => f.name.includes(" — ")) },
   { id: "goal1", icon: "🎯", name: "Goal Getter", desc: "Complete a goal", test: () => goals.some(g => g.current >= g.target) },
   { id: "goal-all", icon: "👑", name: "Overachiever", desc: "Complete 4 goals", test: () => goals.filter(g => g.current >= g.target).length >= 4 },
+  { id: "habit7", icon: "🔁", name: "Habit Hero", desc: "7-day streak on a daily habit", test: () => typeof habits !== "undefined" && habits.some(h => habitBestStreak(h.id) >= 7) },
 ];
 
 function maxGreenRun() {
@@ -189,6 +190,7 @@ function calcGame() {
   xp += swaps.length * 5;
   xp += goals.filter(g => g.current >= g.target).length * 200;
   xp += weeklyHistory(days).xp; // completed weekly challenges, past and present
+  if (typeof habitLog !== "undefined") for (const d in habitLog) xp += habitLog[d].length * 5; // habit check-offs
   const unlocked = ACHIEVEMENTS.filter(a => { try { return a.test(); } catch { return false; } });
   xp += unlocked.length * 50;
 
@@ -264,6 +266,9 @@ function renderGame() {
     { name: "Log your meals", done: todayCals != null, xp: 5 },
     { name: "Stay under your calorie goal", done: todayCals != null && todayCals <= settings.calGoal, xp: 10 },
   ];
+  if (typeof habits !== "undefined" && habits.length) {
+    quests.push({ name: "Complete your daily habits", done: habits.every(h => habitDone(h.id)), xp: 10 });
+  }
   const qDone = quests.filter(q => q.done).length;
   document.getElementById("game-quests").innerHTML = `
     <div class="muted" style="margin-bottom:10px">${qDone} / ${quests.length} complete</div>

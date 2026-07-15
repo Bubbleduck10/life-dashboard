@@ -312,6 +312,39 @@ td.num, th.num { text-align: right; }
 .share-swatch.on { border-color: var(--text); }
 @media (max-width: 720px) { .share-controls { width: 100%; } }
 
+/* daily habits */
+.habit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color .12s, background .12s;
+}
+.habit-item:hover { border-color: var(--accent); }
+.habit-item.done { border-color: rgba(52, 211, 153, .4); background: rgba(52, 211, 153, .07); }
+.habit-item .h-icon { font-size: 22px; }
+.habit-item .h-name { font-weight: 600; flex: 1; }
+.habit-item.done .h-name { text-decoration: line-through; opacity: .65; }
+.habit-item .h-streak { font-size: 12px; color: var(--amber); font-weight: 700; }
+.habit-item .h-check { font-size: 20px; }
+.habit-del { color: var(--muted); }
+
+.habits-suggest { display: flex; gap: 6px; flex-wrap: wrap; }
+.habit-chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 5px 11px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.habit-chip:hover { border-color: var(--accent); color: var(--text); }
+
 /* daily to-do pinned note */
 .dash-top { display: flex; gap: 20px; align-items: flex-start; }
 .dash-top-main { flex: 1; min-width: 0; }

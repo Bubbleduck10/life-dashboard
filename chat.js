@@ -54,6 +54,10 @@ const CHAT_INTENTS = [
     answer: "Click <strong>+ Add restaurant</strong> in the meal builder and <strong>search by name</strong> — there's a built-in library of 40+ chains (McDonald's, Chipotle, Olive Garden, Starbucks, Panda Express…). Pick one and its <strong>full menu loads automatically</strong>, no typing. Only for a spot that isn't listed (a local place) do you create it and add the items yourself — and those custom menus save and sync to your devices."
   },
   {
+    keywords: ["habit", "habits", "daily habit", "gym", "water", "routine", "streak habit", "recurring"],
+    answer: "The <strong>✅ Daily Habits</strong> popup tracks simple recurring things — Gym, Water, Clean, Read… It pops up once a day so you can check them off; they reset each morning and each habit builds a 🔥 streak. Add your own or tap a suggestion. Open it anytime from the <strong>Daily habits</strong> panel on the Overview (the Open button). Checking habits earns XP, and a 7-day streak unlocks the Habit Hero badge."
+  },
+  {
     keywords: ["todo", "to-do", "to do", "task", "tasks", "checklist", "pinned note", "paper note"],
     answer: "The <strong>📝 Daily to-do list</strong> lives at the top of the Goals tab — add tasks, check them off, ✕ to remove. It's also pinned to your Overview as the paper note on the right: click a line to check it off, or type in the note to add a task. Finished tasks clear overnight; unfinished ones carry over to today."
   },

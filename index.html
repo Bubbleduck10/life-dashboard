@@ -22,6 +22,7 @@
     <button data-tab="assets">📈 Assets</button>
     <button data-tab="food">🍎 Food</button>
     <button data-tab="goals">🎯 Goals</button>
+    <button data-tab="peptides">💉 Peptides</button>
     <button data-tab="arcade">🏆 Arcade</button>
     <button data-tab="sync">☁ Sync</button>
   </nav>
@@ -85,6 +86,15 @@
         </span>
       </h2>
       <div id="dash-habits"></div>
+    </div>
+    <div class="panel" id="dash-pep-panel" style="display:none">
+      <h2><span>💉 Peptides today</span>
+        <span style="display:flex;gap:10px;align-items:center">
+          <span class="muted" id="dash-pep-label" style="font-size:12px;font-weight:400"></span>
+          <button class="btn small ghost" onclick="document.querySelector('nav button[data-tab=&quot;peptides&quot;]').click()" type="button">Open</button>
+        </span>
+      </h2>
+      <div id="dash-pep"></div>
     </div>
     <div class="panel">
       <h2><span>🗓️ Weekly challenges</span><span class="muted" id="dash-weekly-label" style="font-size:12px;font-weight:400"></span></h2>
@@ -344,6 +354,52 @@
       <div id="goal-list"></div>
     </div>
   </section>
+
+  <!-- ============ PEPTIDES ============ -->
+  <section class="tab" id="tab-peptides">
+    <div class="grid">
+      <div class="card"><h3>Doses today</h3><div class="big" id="pep-today-count">—</div><div class="sub" id="pep-today-sub"></div></div>
+      <div class="card"><h3>Next dose</h3><div class="big" id="pep-next">—</div><div class="sub" id="pep-next-sub"></div></div>
+      <div class="card"><h3>Reminders</h3>
+        <button class="btn small" id="pep-remind-btn" type="button">🔔 Enable reminders</button>
+        <div class="sub" id="pep-remind-status" style="margin-top:6px"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Today's schedule</h2>
+      <div id="pep-schedule"></div>
+    </div>
+
+    <div class="panel">
+      <h2 id="pep-form-title">Add a peptide</h2>
+      <form id="pep-form">
+        <div class="row">
+          <label class="field" style="flex:1;min-width:150px">Peptide<input id="pep-name" placeholder="e.g. BPC-157" required></label>
+          <label class="field">Dose<input id="pep-dose" type="number" step="any" min="0" style="width:100px" placeholder="e.g. 250"></label>
+          <label class="field">Unit<select id="pep-unit"><option>mcg</option><option>mg</option><option>IU</option><option>units</option><option>ml</option></select></label>
+        </div>
+        <div class="row" style="margin-top:8px;align-items:flex-start">
+          <label class="field">Frequency<select id="pep-freq"><option value="daily">Every day</option><option value="days">Specific days</option><option value="everyN">Every N days</option></select></label>
+          <div class="field" id="pep-days-wrap" style="display:none">Days<div class="pep-days" id="pep-days"></div></div>
+          <label class="field" id="pep-everyn-wrap" style="display:none">Interval<span style="display:flex;gap:6px;align-items:center">every <input id="pep-everyn" type="number" min="1" value="2" style="width:64px"> days from <input id="pep-start" type="date"></span></label>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <div class="field" style="flex:1">Time(s) of day
+            <div class="pep-times" id="pep-times" style="margin-top:5px"></div>
+            <span style="display:flex;gap:6px;margin-top:6px"><input id="pep-time" type="time" value="08:00"><button class="btn small ghost" id="pep-add-time" type="button">+ add time</button></span>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <label class="field" style="flex:1;min-width:160px">Site / notes (optional)<input id="pep-site" placeholder="e.g. subQ abdomen, rotate sides"></label>
+          <button class="btn" type="submit" id="pep-submit">Add peptide</button>
+        </div>
+      </form>
+      <div id="pep-list" style="margin-top:16px"></div>
+      <p class="muted" style="margin-top:12px;font-size:12px">This is a personal reminder tool, not medical advice. Follow the dose and schedule from your healthcare provider. Reminders only fire while the app is open in a tab.</p>
+    </div>
+  </section>
+
   <!-- ============ ARCADE ============ -->
   <section class="tab" id="tab-arcade">
     <div class="panel">
@@ -596,6 +652,7 @@
 <script src="demo.js"></script>
 <script src="app.js"></script>
 <script src="habits.js"></script>
+<script src="peptides.js"></script>
 <script src="game.js"></script>
 <script src="calendar.js"></script>
 <script src="share.js"></script>

@@ -3,7 +3,7 @@
 // GitHub account. Strategy: pull on load, debounced push on every change,
 // last-write-wins by timestamp. Token (classic, gist scope) stays in localStorage.
 
-const SYNC_KEYS = ["life.trades", "life.swaps", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share", "life.habits", "life.habitLog"];
+const SYNC_KEYS = ["life.trades", "life.swaps", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share", "life.habits", "life.habitLog", "life.peptides", "life.peptideLog"];
 const GIST_FILE = "life-dashboard-data.json";
 const GH_API = "https://api.github.com";
 
@@ -49,7 +49,9 @@ function applyRemote(envelope) {
   todos = store.load("life.todos", []);
   habits = store.load("life.habits", []);
   habitLog = store.load("life.habitLog", {});
-  renderMoney(); renderAssets(); renderFood(); renderGoals(); renderTodos(); renderHabits(); renderDashboard();
+  peptides = store.load("life.peptides", []);
+  peptideLog = store.load("life.peptideLog", {});
+  renderMoney(); renderAssets(); renderFood(); renderGoals(); renderTodos(); renderHabits(); renderPeptides(); renderDashboard();
   renderRestaurantSelect();
   ensureSolHistory(); // imported/synced trades may need historical prices
 }

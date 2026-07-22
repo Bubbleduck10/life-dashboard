@@ -54,6 +54,10 @@ const CHAT_INTENTS = [
     answer: "Click <strong>+ Add restaurant</strong> in the meal builder and <strong>search by name</strong> — there's a built-in library of 40+ chains (McDonald's, Chipotle, Olive Garden, Starbucks, Panda Express…). Pick one and its <strong>full menu loads automatically</strong>, no typing. Only for a spot that isn't listed (a local place) do you create it and add the items yourself — and those custom menus save and sync to your devices."
   },
   {
+    keywords: ["peptide", "peptides", "dose", "dosage", "injection", "inject", "medication", "shot", "reminder to take", "bpc", "tirzepatide", "semaglutide"],
+    answer: "The <strong>💉 Peptides</strong> tab is a personal dose reminder. Add each peptide with its dose, unit, how often (daily / specific days / every N days), and the time(s) of day. It shows today's schedule with a <strong>Mark taken</strong> button, your next dose, and a Peptides-today panel on the Overview. Turn on <strong>🔔 reminders</strong> to get a browser nudge at each dose time (while the app is open). It's a tracker, not medical advice — follow your provider's protocol."
+  },
+  {
     keywords: ["habit", "habits", "daily habit", "gym", "water", "routine", "streak habit", "recurring"],
     answer: "The <strong>✅ Daily Habits</strong> popup tracks simple recurring things — Gym, Water, Clean, Read… It pops up once a day so you can check them off; they reset each morning and each habit builds a 🔥 streak. Add your own or tap a suggestion. Open it anytime from the <strong>Daily habits</strong> panel on the Overview (the Open button). Checking habits earns XP, and a 7-day streak unlocks the Habit Hero badge."
   },

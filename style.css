@@ -312,6 +312,44 @@ td.num, th.num { text-align: right; }
 .share-swatch.on { border-color: var(--text); }
 @media (max-width: 720px) { .share-controls { width: 100%; } }
 
+/* peptides */
+.pep-days { display: flex; gap: 5px; margin-top: 5px; }
+.pep-day {
+  width: 34px; height: 34px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--panel-2);
+  color: var(--muted); font-weight: 700; cursor: pointer;
+}
+.pep-day.on { border-color: var(--accent); background: rgba(79,140,255,.15); color: var(--text); }
+
+.pep-times { display: flex; gap: 6px; flex-wrap: wrap; }
+.pep-time-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 13px;
+}
+.pep-time-chip button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; }
+.pep-time-chip button:hover { color: var(--red); }
+
+.pep-dose {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 8px;
+}
+.pep-dose.taken { border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.06); }
+.pep-dose.due { border-color: rgba(251,191,36,.55); background: rgba(251,191,36,.07); }
+.pep-dose-time { font-weight: 800; font-size: 18px; min-width: 58px; }
+.pep-dose.taken .pep-dose-time { opacity: .6; }
+.pep-dose-main { flex: 1; }
+.pep-dose-name { font-weight: 600; }
+.pep-badge.due { background: rgba(251,191,36,.15); color: var(--amber); font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; }
+
+.pep-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 10px; margin-bottom: 8px;
+}
+.pep-item.paused { opacity: .55; }
+
 /* daily habits */
 .habit-item {
   display: flex;

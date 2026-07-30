@@ -282,6 +282,52 @@ document.getElementById("share-download").addEventListener("click", () => {
   }, "image/png");
 });
 
+function downloadShareVideo(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+
+let ffmpegLib = null;
+function loadScriptOnce(src) {
+  return new Promise((res, rej) => {
+    if ([...document.scripts].some(s => s.src === src)) return res();
+    const s = document.createElement("script");
+    s.src = src; s.crossOrigin = "anonymous";
+    s.onload = () => res(); s.onerror = () => rej(new Error("load " + src));
+    document.head.appendChild(s);
+  });
+}
+async function getFFmpeg(status) {
+  if (ffmpegLib) return ffmpegLib;
+  status.textContent = "Loading MP4 converter (first time, ~30 MB)…";
+  await loadScriptOnce("https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js");
+  const { createFFmpeg, fetchFile } = window.FFmpeg;
+  const ff = createFFmpeg({ log: false, corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js" });
+  ff.setProgress(({ ratio }) => { if (ratio >= 0 && ratio <= 1) status.textContent = `Converting to MP4… ${Math.round(ratio * 100)}%`; });
+  await ff.load();
+  ffmpegLib = { ff, fetchFile };
+  return ffmpegLib;
+}
+// convert a recorded webm to MP4 in-browser (only used when native MP4 recording isn't available)
+async function transcodeToMp4(webmBlob, baseName, status, btn) {
+  btn.textContent = "Converting…";
+  try {
+    const { ff, fetchFile } = await getFFmpeg(status);
+    ff.FS("writeFile", "in.webm", await fetchFile(webmBlob));
+    await ff.run("-i", "in.webm", "-c:v", "libx264", "-preset", "veryfast", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "out.mp4");
+    const data = ff.FS("readFile", "out.mp4");
+    try { ff.FS("unlink", "in.webm"); ff.FS("unlink", "out.mp4"); } catch {}
+    downloadShareVideo(new Blob([data.buffer], { type: "video/mp4" }), baseName + ".mp4");
+    status.textContent = "Saved an MP4.";
+  } catch {
+    downloadShareVideo(webmBlob, baseName + ".webm");
+    status.textContent = "MP4 conversion unavailable here — saved WebM instead.";
+  }
+}
+
 document.getElementById("share-record").addEventListener("click", async () => {
   if (shareRecording) return;
   const canvas = document.getElementById("share-canvas");
@@ -292,11 +338,20 @@ document.getElementById("share-record").addEventListener("click", async () => {
   }
   const hasVideo = shareState.bg.type === "video" && shareVideo;
   const wantSound = hasVideo && document.getElementById("share-sound").checked;
-  const type = [
-    ...(wantSound ? ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus"] : []),
-    "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm",
-  ].find(t => MediaRecorder.isTypeSupported(t));
+  const wantMp4 = document.getElementById("share-format").value === "mp4";
+
+  // prefer native MP4 recording (modern browsers); else record webm
+  const mp4Mimes = wantSound
+    ? ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/mp4"]
+    : ["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1.42E01E", "video/mp4"];
+  const webmMimes = wantSound
+    ? ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"]
+    : ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+  let container = "webm", type = null;
+  if (wantMp4) { type = mp4Mimes.find(t => MediaRecorder.isTypeSupported(t)); if (type) container = "mp4"; }
+  if (!type) type = webmMimes.find(t => MediaRecorder.isTypeSupported(t));
   if (!type) { status.textContent = "Video recording isn't supported here — use Save image."; return; }
+  const needTranscode = wantMp4 && container === "webm"; // recorded webm, must convert to mp4
 
   shareRecording = true;
   stopShareLoop();
@@ -317,18 +372,20 @@ document.getElementById("share-record").addEventListener("click", async () => {
 
   const rec = new MediaRecorder(recStream, { mimeType: type });
   const chunks = [];
+  const baseName = `pnl-${shareState.period}-${shareState.period === "daily" ? shareState.date : viewMonth}`;
   rec.ondataavailable = e => e.data.size && chunks.push(e.data);
-  rec.onstop = () => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
-    a.download = `pnl-${shareState.period}-${shareState.period === "daily" ? shareState.date : viewMonth}.webm`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-    shareRecording = false; shareZoom = 0;
+  rec.onstop = async () => {
     if (hasVideo) shareVideo.muted = wasMuted; // restore preview mute state
+    if (hasVideo) { shareLoop(); } else { shareZoom = 0; drawShareCard(); }
+    const blob = new Blob(chunks, { type: container === "mp4" ? "video/mp4" : "video/webm" });
+    if (needTranscode) {
+      await transcodeToMp4(blob, baseName, status, btn);
+    } else {
+      downloadShareVideo(blob, baseName + "." + container);
+      status.textContent = `Saved a .${container} clip` + (wantSound ? " with sound" : "") + (container === "webm" ? ". (If a site won't accept .webm, pick MP4 above.)" : ".");
+    }
+    shareRecording = false;
     btn.textContent = "🎬 Save video"; btn.disabled = false;
-    if (hasVideo) { shareLoop(); } else drawShareCard();
-    status.textContent = "Saved a .webm clip" + (wantSound ? " with sound" : "") + ". (If a site won't accept .webm, convert it to MP4.)";
   };
 
   const durMs = hasVideo

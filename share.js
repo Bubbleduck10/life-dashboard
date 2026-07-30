@@ -59,9 +59,50 @@ function sharePeriodData() {
   return { label, coin, start, end, profit, pct, usd: false };
 }
 
+// always includes exactly one sign, so callers must NOT add their own "+"
 function shareFmt(v, usd) {
   if (usd) return (v >= 0 ? "+$" : "-$") + Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: 2 });
-  return v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  return (v >= 0 ? "+" : "") + v.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
+
+/* ----- currency marks drawn on the canvas ----- */
+const coinTokenCache = {};
+function coinToken(sym, size, color) {
+  const key = sym + "|" + size + "|" + color;
+  if (coinTokenCache[key]) return coinTokenCache[key];
+  const c = document.createElement("canvas"); c.width = size; c.height = size;
+  const x = c.getContext("2d");
+  x.fillStyle = color; x.beginPath(); x.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2); x.fill();
+  x.globalCompositeOperation = "destination-out";
+  x.font = `800 ${Math.round(size * 0.62)}px "Segoe UI", system-ui, sans-serif`;
+  x.textAlign = "center"; x.textBaseline = "middle";
+  x.fillText(sym, size / 2, size / 2 + size * 0.03);
+  coinTokenCache[key] = c;
+  return c;
+}
+function drawSolMark(ctx, x, y, s, color) {
+  ctx.fillStyle = color;
+  const w = s * 1.25, bh = s * 0.24, gap = (s - 3 * bh) / 2, k = s * 0.34;
+  for (let i = 0; i < 3; i++) {
+    const by = y + i * (bh + gap); // three right-leaning parallelograms
+    ctx.beginPath();
+    ctx.moveTo(x + k, by); ctx.lineTo(x + w, by);
+    ctx.lineTo(x + w - k, by + bh); ctx.lineTo(x, by + bh);
+    ctx.closePath(); ctx.fill();
+  }
+}
+function drawEthMark(ctx, x, y, s, color) {
+  ctx.fillStyle = color;
+  const cx = x + s * 0.45, w = s * 0.9;
+  ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(x + w, y + s * 0.55); ctx.lineTo(cx, y + s * 0.7); ctx.lineTo(x, y + s * 0.55); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x + s * 0.03, y + s * 0.6); ctx.lineTo(cx, y + s); ctx.lineTo(x + w - s * 0.03, y + s * 0.6); ctx.closePath(); ctx.fill();
+}
+const coinIconWidth = (coin, s) => coin === "SOL" ? s * 1.25 : coin === "ETH" ? s * 0.9 : s;
+function drawCoinIcon(ctx, coin, x, y, s, color) {
+  if (coin === "SOL") { drawSolMark(ctx, x, y, s, color); return; }
+  if (coin === "ETH") { drawEthMark(ctx, x, y, s, color); return; }
+  const sym = coin === "BTC" ? "₿" : coin === "USDC" ? "$" : (coin[0] || "$");
+  ctx.drawImage(coinToken(sym, Math.round(s), color), x, y, s, s);
 }
 
 function drawShareBackground(ctx, W, H) {
@@ -121,33 +162,42 @@ function drawShareCard() {
     ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.font = '700 60px "Segoe UI", system-ui, sans-serif';
     ctx.fillText("No trades this " + shareState.period.replace("ly", ""), 60, 280);
   } else {
-    // big PnL pill
+    // big PnL pill with the coin's mark (single sign — shareFmt owns it)
     const usd = d.usd;
-    const fmtBal = v => usd ? "$" + v.toLocaleString(undefined, { maximumFractionDigits: 2 }) : (COIN_GLYPH[d.coin] || "") + " " + v.toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const glyph = usd ? "" : (COIN_GLYPH[d.coin] || d.coin) + " ";
-    const bigText = `${glyph}${(d.profit >= 0 ? "+" : "") + shareFmt(d.profit, usd)}`;
+    const numText = shareFmt(d.profit, usd);
     ctx.font = '800 96px "Segoe UI", system-ui, sans-serif';
-    const tw = ctx.measureText(bigText).width;
-    const pillX = 50, pillY = 190, pillH = 128, pillW = tw + 72;
+    const numW = ctx.measureText(numText).width;
+    const showIcon = !usd; // coin modes show the logo; USD/All already carry "$"
+    const iconS = 66;
+    const iconW = showIcon ? coinIconWidth(d.coin, iconS) : 0;
+    const iconGap = showIcon ? 20 : 0;
+    const pillX = 50, pillY = 190, pillH = 128, pillW = iconW + iconGap + numW + 72;
     noShadow();
     roundRect(ctx, pillX, pillY, pillW, pillH, 16); ctx.fillStyle = accent; ctx.fill();
-    ctx.fillStyle = WHITE; ctx.textBaseline = "middle";
-    ctx.fillText(bigText, pillX + 36, pillY + pillH / 2 + 4);
+    const cy = pillY + pillH / 2;
+    let cx = pillX + 36;
+    if (showIcon) { drawCoinIcon(ctx, d.coin, cx, cy - iconS / 2, iconS, WHITE); cx += iconW + iconGap; }
+    ctx.fillStyle = WHITE; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.fillText(numText, cx, cy + 4);
     ctx.textBaseline = "alphabetic";
 
-    // detail rows
+    // detail rows (small coin mark before balances in coin mode)
     shadow();
     const rows = [
-      ["PNL", d.pct == null ? "—" : (d.pct >= 0 ? "+" : "") + d.pct.toFixed(0) + "%", accent],
-      ["Start Balance", fmtBal(d.start), WHITE],
-      ["End Balance", fmtBal(d.end), WHITE],
+      { lab: "PNL", val: d.pct == null ? "—" : (d.pct >= 0 ? "+" : "") + d.pct.toFixed(0) + "%", col: accent, icon: false },
+      { lab: "Start Balance", num: d.start, col: WHITE, icon: !usd },
+      { lab: "End Balance", num: d.end, col: WHITE, icon: !usd },
     ];
     let ry = 430;
-    for (const [lab, val, col] of rows) {
+    for (const r of rows) {
+      ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
       ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.font = '600 38px "Segoe UI", system-ui, sans-serif';
-      ctx.fillText(lab, 60, ry);
-      ctx.fillStyle = col; ctx.font = '700 38px "Segoe UI", system-ui, sans-serif';
-      ctx.fillText(val, 430, ry);
+      ctx.fillText(r.lab, 60, ry);
+      ctx.font = '700 38px "Segoe UI", system-ui, sans-serif'; ctx.fillStyle = r.col;
+      let vx = 430;
+      if (r.icon) { const is = 30; drawCoinIcon(ctx, d.coin, vx, ry - 27, is, r.col); vx += coinIconWidth(d.coin, is) + 10; }
+      const valStr = r.val !== undefined ? r.val : (usd ? "$" : "") + r.num.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      ctx.fillText(valStr, vx, ry);
       ry += 60;
     }
     // per-currency breakdown when combining All

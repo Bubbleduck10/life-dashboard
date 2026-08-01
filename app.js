@@ -55,6 +55,7 @@ const COINS = {
   USDC: { fixed: 1 },
   ETH:  { cgId: "ethereum", cb: "ETH-USD" },
   BTC:  { cgId: "bitcoin",  cb: "BTC-USD" },
+  BNB:  { cgId: "binancecoin" }, // no Coinbase pair — historical prices via CoinGecko
 };
 
 function livePrice(coin) {
@@ -102,18 +103,30 @@ async function ensureSolHistory() {
     const missing = [...byCoin[coin]].sort();
     coinHist[coin] = coinHist[coin] || {};
     try {
-      // Coinbase daily candles, max ~300 per request
-      let from = new Date(missing[0] + "T00:00:00Z");
-      const end = new Date(missing[missing.length - 1] + "T00:00:00Z");
-      while (from <= end) {
-        const to = new Date(Math.min(from.getTime() + 299 * 86400e3, end.getTime() + 86400e3));
-        const res = await fetch(`https://api.exchange.coinbase.com/products/${COINS[coin].cb}/candles?granularity=86400&start=${from.toISOString()}&end=${to.toISOString()}`);
+      if (COINS[coin].cb) {
+        // Coinbase daily candles, max ~300 per request
+        let from = new Date(missing[0] + "T00:00:00Z");
+        const end = new Date(missing[missing.length - 1] + "T00:00:00Z");
+        while (from <= end) {
+          const to = new Date(Math.min(from.getTime() + 299 * 86400e3, end.getTime() + 86400e3));
+          const res = await fetch(`https://api.exchange.coinbase.com/products/${COINS[coin].cb}/candles?granularity=86400&start=${from.toISOString()}&end=${to.toISOString()}`);
+          if (!res.ok) throw new Error("history " + res.status);
+          for (const c of await res.json()) {
+            coinHist[coin][new Date(c[0] * 1000).toISOString().slice(0, 10)] = c[4]; // close
+            got = true;
+          }
+          from = new Date(to.getTime());
+        }
+      } else if (COINS[coin].cgId) {
+        // no Coinbase pair (e.g. BNB) — daily prices from CoinGecko
+        const days = Math.min(365, Math.ceil((Date.now() - new Date(missing[0] + "T00:00:00Z").getTime()) / 86400e3) + 2);
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${COINS[coin].cgId}/market_chart?vs_currency=usd&days=${days}&interval=daily`);
         if (!res.ok) throw new Error("history " + res.status);
-        for (const c of await res.json()) {
-          coinHist[coin][new Date(c[0] * 1000).toISOString().slice(0, 10)] = c[4]; // close
+        const data = await res.json();
+        for (const [ts, price] of (data.prices || [])) {
+          coinHist[coin][new Date(ts).toISOString().slice(0, 10)] = price;
           got = true;
         }
-        from = new Date(to.getTime());
       }
     } catch {} // fall back to live price for unpriced days
   }

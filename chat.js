@@ -7,7 +7,7 @@ const CHAT_INTENTS = [
   },
   {
     keywords: ["currency", "usdc", "different coin", "change coin", "eth instead", "btc instead", "other coin", "trade eth", "trade btc"],
-    answer: "The <strong>Currency</strong> selector in the Log-a-trading-day form lets you track <strong>SOL, USDC, ETH, or BTC</strong>. You can log <strong>several currencies on the same day</strong> — just log the date again with a different coin and both entries stack (re-logging the same date + coin overwrites it). USDC counts as $1 flat; ETH and BTC use live and historical day-of prices like SOL. The day's card, calendar, and totals combine them into one USD figure."
+    answer: "The <strong>Currency</strong> selector in the Log-a-trading-day form lets you track <strong>SOL, USDC, ETH, BTC, or BNB</strong>. You can log <strong>several currencies on the same day</strong> — just log the date again with a different coin and both entries stack (re-logging the same date + coin overwrites it). USDC counts as $1 flat; ETH and BTC use live and historical day-of prices like SOL. The day's card, calendar, and totals combine them into one USD figure."
   },
   {
     keywords: ["note", "notes", "journal", "write on a day"],

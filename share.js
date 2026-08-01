@@ -97,10 +97,18 @@ function drawEthMark(ctx, x, y, s, color) {
   ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(x + w, y + s * 0.55); ctx.lineTo(cx, y + s * 0.7); ctx.lineTo(x, y + s * 0.55); ctx.closePath(); ctx.fill();
   ctx.beginPath(); ctx.moveTo(x + s * 0.03, y + s * 0.6); ctx.lineTo(cx, y + s); ctx.lineTo(x + w - s * 0.03, y + s * 0.6); ctx.closePath(); ctx.fill();
 }
+function drawBnbMark(ctx, x, y, s, color) {
+  ctx.fillStyle = color;
+  const cx = x + s / 2, cy = y + s / 2, d = s * 0.31, h = s * 0.15;
+  const dia = (px, py, hh) => { ctx.beginPath(); ctx.moveTo(px, py - hh); ctx.lineTo(px + hh, py); ctx.lineTo(px, py + hh); ctx.lineTo(px - hh, py); ctx.closePath(); ctx.fill(); };
+  dia(cx, cy, h * 1.2); // center
+  dia(cx, cy - d, h); dia(cx, cy + d, h); dia(cx - d, cy, h); dia(cx + d, cy, h); // N/E/S/W
+}
 const coinIconWidth = (coin, s) => coin === "SOL" ? s * 1.25 : coin === "ETH" ? s * 0.9 : s;
 function drawCoinIcon(ctx, coin, x, y, s, color) {
   if (coin === "SOL") { drawSolMark(ctx, x, y, s, color); return; }
   if (coin === "ETH") { drawEthMark(ctx, x, y, s, color); return; }
+  if (coin === "BNB") { drawBnbMark(ctx, x, y, s, color); return; }
   const sym = coin === "BTC" ? "₿" : coin === "USDC" ? "$" : (coin[0] || "$");
   ctx.drawImage(coinToken(sym, Math.round(s), color), x, y, s, s);
 }

@@ -93,13 +93,17 @@ function coinToken(sym, size, color) {
   return c;
 }
 function drawSolMark(ctx, x, y, s, color) {
+  // Solana-style mark: three sheared bars with the signature offset flow
+  // (top shifted right, bottom shifted left). Single fill → takes any color.
   ctx.fillStyle = color;
-  const w = s * 1.25, bh = s * 0.24, gap = (s - 3 * bh) / 2, k = s * 0.34;
+  const w = s, bh = s * 0.245, gap = (s - 3 * bh) / 2, k = s * 0.30, off = s * 0.14;
+  const offs = [off * 2, off, 0]; // top → right, bottom → left
   for (let i = 0; i < 3; i++) {
-    const by = y + i * (bh + gap); // three right-leaning parallelograms
+    const by = y + i * (bh + gap);
+    const ox = x + offs[i];
     ctx.beginPath();
-    ctx.moveTo(x + k, by); ctx.lineTo(x + w, by);
-    ctx.lineTo(x + w - k, by + bh); ctx.lineTo(x, by + bh);
+    ctx.moveTo(ox + k, by); ctx.lineTo(ox + w, by);
+    ctx.lineTo(ox + w - k, by + bh); ctx.lineTo(ox, by + bh);
     ctx.closePath(); ctx.fill();
   }
 }
@@ -116,7 +120,7 @@ function drawBnbMark(ctx, x, y, s, color) {
   dia(cx, cy, h * 1.2); // center
   dia(cx, cy - d, h); dia(cx, cy + d, h); dia(cx - d, cy, h); dia(cx + d, cy, h); // N/E/S/W
 }
-const coinIconWidth = (coin, s) => coin === "SOL" ? s * 1.25 : coin === "ETH" ? s * 0.9 : s;
+const coinIconWidth = (coin, s) => coin === "SOL" ? s * 1.3 : coin === "ETH" ? s * 0.9 : s;
 function drawCoinIcon(ctx, coin, x, y, s, color) {
   if (coin === "SOL") { drawSolMark(ctx, x, y, s, color); return; }
   if (coin === "ETH") { drawEthMark(ctx, x, y, s, color); return; }

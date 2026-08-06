@@ -503,7 +503,7 @@ document.getElementById("share-record").addEventListener("click", async () => {
   };
 
   const durMs = hasVideo
-    ? Math.min(shareVideo.duration && isFinite(shareVideo.duration) ? shareVideo.duration : 6, 10) * 1000
+    ? Math.min(shareVideo.duration && isFinite(shareVideo.duration) ? shareVideo.duration : 6, 45) * 1000
     : 4000;
   if (hasVideo) { shareVideo.currentTime = 0; try { await shareVideo.play(); } catch {} }
 

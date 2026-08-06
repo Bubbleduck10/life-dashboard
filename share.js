@@ -19,11 +19,23 @@ let shareState = {
 let shareImg = null, shareVideo = null, shareRAF = null, shareRecording = false, shareZoom = 0;
 let sharePrefs = store.load("life.share", { name: "", handle: "axiom.trade/icy" });
 
+function share7dStart() {
+  const d = new Date(); d.setDate(d.getDate() - 6);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+const shareFileBase = () => `pnl-${shareState.period === "daily" ? shareState.date : shareState.period === "7day" ? "last7d-" + todayStr() : viewMonth}`;
+
 function sharePeriodData() {
   const coin = shareState.coin;
-  const inPeriod = t => shareState.period === "daily" ? t.date === shareState.date : t.date.startsWith(viewMonth);
+  const wk = share7dStart(), today = todayStr();
+  const inPeriod = t => shareState.period === "daily" ? t.date === shareState.date
+    : shareState.period === "7day" ? (t.date >= wk && t.date <= today)
+    : t.date.startsWith(viewMonth);
+  const fmtShort = ds => new Date(ds + "T12:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
   const label = shareState.period === "daily"
     ? new Date(shareState.date + "T12:00").toLocaleDateString(undefined, { weekday: "short", month: "long", day: "numeric", year: "numeric" })
+    : shareState.period === "7day"
+    ? `${fmtShort(wk)} – ${fmtShort(today)}, ${new Date(today + "T12:00").getFullYear()}`
     : new Date(viewMonth + "-01T12:00").toLocaleDateString(undefined, { month: "long", year: "numeric" });
 
   // combined across every currency → everything valued in USD
@@ -168,7 +180,7 @@ function drawShareCard() {
 
   if (d.empty) {
     ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.font = '700 60px Sora, "Segoe UI", system-ui, sans-serif';
-    ctx.fillText("No trades this " + shareState.period.replace("ly", ""), 60, 280);
+    ctx.fillText(shareState.period === "7day" ? "No trades in the last 7 days" : shareState.period === "daily" ? "No trades this day" : "No trades this month", 60, 280);
   } else {
     // big PnL pill with the coin's mark (single sign — shareFmt owns it)
     const usd = d.usd;
@@ -356,7 +368,7 @@ document.getElementById("share-download").addEventListener("click", async () => 
   document.getElementById("share-canvas").toBlob(blob => {
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `pnl-${shareState.period}-${shareState.period === "daily" ? shareState.date : viewMonth}.png`;
+    a.download = shareFileBase() + ".png";
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }, "image/png");
@@ -453,7 +465,7 @@ document.getElementById("share-record").addEventListener("click", async () => {
 
   const rec = new MediaRecorder(recStream, { mimeType: type });
   const chunks = [];
-  const baseName = `pnl-${shareState.period}-${shareState.period === "daily" ? shareState.date : viewMonth}`;
+  const baseName = shareFileBase();
   rec.ondataavailable = e => e.data.size && chunks.push(e.data);
   rec.onstop = async () => {
     if (hasVideo) shareVideo.muted = wasMuted; // restore preview mute state

@@ -92,6 +92,19 @@ function coinToken(sym, size, color) {
   coinTokenCache[key] = c;
   return c;
 }
+// Official Solana mark (three-bar gradient logo), embedded as a vector image
+const SOL_LOGO_SVG =
+  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 398 312'>" +
+  "<defs><linearGradient id='sg' x1='370' y1='0' x2='30' y2='312' gradientUnits='userSpaceOnUse'>" +
+  "<stop stop-color='#14F195'/><stop offset='1' stop-color='#9945FF'/></linearGradient></defs>" +
+  "<path fill='url(#sg)' d='M64.6004 237.909C67.0627 235.447 70.4331 234.036 74.0034 234.036H392.404C398.318 234.036 401.275 241.19 397.093 245.373L334.395 308.07C331.933 310.532 328.562 311.943 324.992 311.943H6.59161C0.678185 311.943 -2.27942 304.789 1.90271 300.607L64.6004 237.909Z'/>" +
+  "<path fill='url(#sg)' d='M64.6004 3.87401C67.1626 1.41172 70.5331 0.000762939 74.0034 0.000762939H392.404C398.318 0.000762939 401.275 7.15466 397.093 11.3368L334.395 74.0345C331.933 76.4967 328.562 77.9077 324.992 77.9077H6.59161C0.678185 77.9077 -2.27942 70.7538 1.90271 66.5717L64.6004 3.87401Z'/>" +
+  "<path fill='url(#sg)' d='M334.395 120.842C331.933 118.38 328.562 116.969 324.992 116.969H6.59161C0.678185 116.969 -2.27942 124.123 1.90271 128.305L64.6004 191.003C67.0627 193.465 70.4331 194.876 74.0034 194.876H392.404C398.318 194.876 401.275 187.722 397.093 183.54L334.395 120.842Z'/>" +
+  "</svg>";
+const solLogoImg = new Image();
+solLogoImg.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(SOL_LOGO_SVG);
+solLogoImg.onload = () => { if (typeof drawShareCard === "function" && document.getElementById("share-modal") && document.getElementById("share-modal").style.display === "flex") drawShareCard(); };
+
 function drawSolMark(ctx, x, y, s, color) {
   // Solana-style mark: three sheared bars with the signature offset flow
   // (top shifted right, bottom shifted left). Single fill → takes any color.
@@ -120,9 +133,13 @@ function drawBnbMark(ctx, x, y, s, color) {
   dia(cx, cy, h * 1.2); // center
   dia(cx, cy - d, h); dia(cx, cy + d, h); dia(cx - d, cy, h); dia(cx + d, cy, h); // N/E/S/W
 }
-const coinIconWidth = (coin, s) => coin === "SOL" ? s * 1.3 : coin === "ETH" ? s * 0.9 : s;
+const coinIconWidth = (coin, s) => coin === "SOL" ? s * 1.276 : coin === "ETH" ? s * 0.9 : s;
 function drawCoinIcon(ctx, coin, x, y, s, color) {
-  if (coin === "SOL") { drawSolMark(ctx, x, y, s, color); return; }
+  if (coin === "SOL") {
+    if (solLogoImg.complete && solLogoImg.naturalWidth) ctx.drawImage(solLogoImg, x, y, s * 1.276, s);
+    else drawSolMark(ctx, x, y, s, color); // vector fallback until the logo loads
+    return;
+  }
   if (coin === "ETH") { drawEthMark(ctx, x, y, s, color); return; }
   if (coin === "BNB") { drawBnbMark(ctx, x, y, s, color); return; }
   const sym = coin === "BTC" ? "₿" : coin === "USDC" ? "$" : (coin[0] || "$");

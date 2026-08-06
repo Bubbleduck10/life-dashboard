@@ -147,6 +147,10 @@ function drawCoinIcon(ctx, coin, x, y, s, color) {
 }
 
 function drawShareBackground(ctx, W, H) {
+  if (shareState.bg.type === "transparent") {
+    ctx.clearRect(0, 0, W, H); // no backdrop or scrim — export keeps alpha
+    return;
+  }
   if (shareState.bg.type === "image" && shareImg) {
     drawCover(ctx, shareImg, W, H, shareZoom);
   } else if (shareState.bg.type === "video" && shareVideo && shareVideo.readyState >= 2) {
@@ -275,11 +279,14 @@ function stopShareLoop() { if (shareRAF) { cancelAnimationFrame(shareRAF); share
 /* ----- UI wiring ----- */
 function renderSharePresets() {
   const box = document.getElementById("share-presets");
-  box.innerHTML = Object.keys(SHARE_PRESETS).map(k =>
+  const gradients = Object.keys(SHARE_PRESETS).map(k =>
     `<span class="share-swatch ${shareState.bg.type === "gradient" && shareState.bg.key === k ? "on" : ""}" data-preset="${k}"
        style="background:linear-gradient(135deg,${SHARE_PRESETS[k][0]},${SHARE_PRESETS[k][1]})"></span>`).join("");
+  const transparent = `<span class="share-swatch ${shareState.bg.type === "transparent" ? "on" : ""}" data-preset="__transparent" title="Transparent"
+       style="background:repeating-conic-gradient(#7a7a7a 0% 25%, #cfcfcf 0% 50%) 50% / 12px 12px"></span>`;
+  box.innerHTML = gradients + transparent;
   box.querySelectorAll("[data-preset]").forEach(el => el.addEventListener("click", () => {
-    shareState.bg = { type: "gradient", key: el.dataset.preset };
+    shareState.bg = el.dataset.preset === "__transparent" ? { type: "transparent" } : { type: "gradient", key: el.dataset.preset };
     stopShareLoop(); renderSharePresets(); updateVideoOpts(); drawShareCard();
   }));
 }

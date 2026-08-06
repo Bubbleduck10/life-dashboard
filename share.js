@@ -74,7 +74,7 @@ function coinToken(sym, size, color) {
   const x = c.getContext("2d");
   x.fillStyle = color; x.beginPath(); x.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2); x.fill();
   x.globalCompositeOperation = "destination-out";
-  x.font = `800 ${Math.round(size * 0.62)}px "Segoe UI", system-ui, sans-serif`;
+  x.font = `800 ${Math.round(size * 0.62)}px Sora, "Segoe UI", system-ui, sans-serif`;
   x.textAlign = "center"; x.textBaseline = "middle";
   x.fillText(sym, size / 2, size / 2 + size * 0.03);
   coinTokenCache[key] = c;
@@ -163,17 +163,17 @@ function drawShareCard() {
 
   // period label
   ctx.textBaseline = "alphabetic"; ctx.textAlign = "left"; shadow();
-  ctx.fillStyle = WHITE; ctx.font = '600 46px "Segoe UI", system-ui, sans-serif';
+  ctx.fillStyle = WHITE; ctx.font = '600 46px Sora, "Segoe UI", system-ui, sans-serif';
   ctx.fillText(d.label, 60, 150);
 
   if (d.empty) {
-    ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.font = '700 60px "Segoe UI", system-ui, sans-serif';
+    ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.font = '700 60px Sora, "Segoe UI", system-ui, sans-serif';
     ctx.fillText("No trades this " + shareState.period.replace("ly", ""), 60, 280);
   } else {
     // big PnL pill with the coin's mark (single sign — shareFmt owns it)
     const usd = d.usd;
     const numText = shareFmt(d.profit, usd);
-    ctx.font = '800 96px "Segoe UI", system-ui, sans-serif';
+    ctx.font = '800 96px Sora, "Segoe UI", system-ui, sans-serif';
     const numW = ctx.measureText(numText).width;
     const showIcon = !usd; // coin modes show the logo; USD/All already carry "$"
     const iconS = 66;
@@ -199,9 +199,9 @@ function drawShareCard() {
     let ry = 430;
     for (const r of rows) {
       ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-      ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.font = '600 38px "Segoe UI", system-ui, sans-serif';
+      ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.font = '600 38px Sora, "Segoe UI", system-ui, sans-serif';
       ctx.fillText(r.lab, 60, ry);
-      ctx.font = '700 38px "Segoe UI", system-ui, sans-serif'; ctx.fillStyle = r.col;
+      ctx.font = '700 38px Sora, "Segoe UI", system-ui, sans-serif'; ctx.fillStyle = r.col;
       let vx = 430;
       if (r.icon) { const is = 30; drawCoinIcon(ctx, d.coin, vx, ry - 27, is, r.col); vx += coinIconWidth(d.coin, is) + 10; }
       const valStr = r.val !== undefined ? r.val : (usd ? "$" : "") + r.num.toLocaleString(undefined, { maximumFractionDigits: 2 });
@@ -212,16 +212,16 @@ function drawShareCard() {
     if (d.all) {
       const parts = Object.entries(d.breakdown)
         .map(([c, v]) => `${c} ${v >= 0 ? "+" : ""}${v.toLocaleString(undefined, { maximumFractionDigits: 2 })}`).join("    ");
-      ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.font = '600 27px "Segoe UI", system-ui, sans-serif';
+      ctx.fillStyle = "rgba(255,255,255,0.8)"; ctx.font = '600 27px Sora, "Segoe UI", system-ui, sans-serif';
       ctx.fillText(parts, 60, ry + 6);
     }
   }
 
   // bottom-left branding
   shadow();
-  ctx.fillStyle = WHITE; ctx.font = '800 44px "Segoe UI", system-ui, sans-serif';
+  ctx.fillStyle = WHITE; ctx.font = '800 44px Sora, "Segoe UI", system-ui, sans-serif';
   ctx.fillText(sharePrefs.name || "@you", 60, H - 90);
-  ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.font = '600 30px "Segoe UI", system-ui, sans-serif';
+  ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.font = '600 30px Sora, "Segoe UI", system-ui, sans-serif';
   ctx.fillText("🌐 " + (sharePrefs.handle || "axiom.trade/icy"), 60, H - 48);
   noShadow();
 }
@@ -255,6 +255,26 @@ function syncUnitEnabled() {
   document.getElementById("share-unit").disabled = shareState.coin === "ALL";
 }
 
+// canvas ignores CSS font loading, so make sure Sora is ready before drawing
+let shareFontsReady = false;
+async function loadShareFonts() {
+  if (shareFontsReady) return;
+  if (document.fonts && document.fonts.load) {
+    try {
+      await Promise.all([
+        document.fonts.load("800 96px Sora"),
+        document.fonts.load("700 38px Sora"),
+        document.fonts.load("600 46px Sora"),
+        document.fonts.load("500 30px Sora"),
+      ]);
+    } catch {}
+  }
+  shareFontsReady = true;
+}
+loadShareFonts().then(() => {
+  if (document.getElementById("share-modal").style.display === "flex") drawShareCard();
+});
+
 function openShare() {
   document.getElementById("share-modal").style.display = "flex";
   document.getElementById("share-name").value = sharePrefs.name;
@@ -268,6 +288,7 @@ function openShare() {
   renderSharePresets();
   updateVideoOpts();
   drawShareCard();
+  loadShareFonts().then(() => { if (document.getElementById("share-modal").style.display === "flex") drawShareCard(); });
 }
 function closeShare() {
   stopShareLoop();
@@ -329,7 +350,8 @@ document.getElementById("share-preview-sound").addEventListener("click", () => {
   document.getElementById("share-preview-sound").textContent = shareVideo.muted ? "🔇 Hear preview" : "🔊 Mute preview";
 });
 
-document.getElementById("share-download").addEventListener("click", () => {
+document.getElementById("share-download").addEventListener("click", async () => {
+  await loadShareFonts();
   drawShareCard();
   document.getElementById("share-canvas").toBlob(blob => {
     const a = document.createElement("a");
@@ -388,6 +410,7 @@ async function transcodeToMp4(webmBlob, baseName, status, btn) {
 
 document.getElementById("share-record").addEventListener("click", async () => {
   if (shareRecording) return;
+  await loadShareFonts();
   const canvas = document.getElementById("share-canvas");
   const status = document.getElementById("share-status");
   const btn = document.getElementById("share-record");

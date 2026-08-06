@@ -216,13 +216,18 @@ function drawShareCard() {
     const iconS = 66;
     const iconW = showIcon ? coinIconWidth(d.coin, iconS) : 0;
     const iconGap = showIcon ? 20 : 0;
+    const transparent = shareState.bg.type === "transparent";
     const pillX = 50, pillY = 190, pillH = 128, pillW = iconW + iconGap + numW + 72;
-    noShadow();
-    roundRect(ctx, pillX, pillY, pillW, pillH, 16); ctx.fillStyle = accent; ctx.fill();
+    if (!transparent) {
+      noShadow();
+      roundRect(ctx, pillX, pillY, pillW, pillH, 16); ctx.fillStyle = accent; ctx.fill();
+    }
     const cy = pillY + pillH / 2;
     let cx = pillX + 36;
-    if (showIcon) { drawCoinIcon(ctx, d.coin, cx, cy - iconS / 2, iconS, WHITE); cx += iconW + iconGap; }
-    ctx.fillStyle = WHITE; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    // on transparent: no pill box; number takes the accent color with a shadow
+    if (transparent) shadow(); else noShadow();
+    if (showIcon) { drawCoinIcon(ctx, d.coin, cx, cy - iconS / 2, iconS, transparent ? accent : WHITE); cx += iconW + iconGap; }
+    ctx.fillStyle = transparent ? accent : WHITE; ctx.textAlign = "left"; ctx.textBaseline = "middle";
     ctx.fillText(numText, cx, cy + 4);
     ctx.textBaseline = "alphabetic";
 

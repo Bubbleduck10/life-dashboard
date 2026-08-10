@@ -233,10 +233,11 @@ function drawShareCard() {
 
     // detail rows (small coin mark before balances in coin mode)
     shadow();
+    const periodWord = shareState.period === "daily" ? "Day" : shareState.period === "7day" ? "Week" : "Month";
     const rows = [
       { lab: "PNL", val: d.pct == null ? "—" : (d.pct >= 0 ? "+" : "") + d.pct.toFixed(0) + "%", col: accent, icon: false },
-      { lab: "Start Balance", num: d.start, col: WHITE, icon: !usd },
-      { lab: "End Balance", num: d.end, col: WHITE, icon: !usd },
+      { lab: `${periodWord} Start`, num: d.start, col: WHITE, icon: !usd },
+      { lab: `${periodWord} End`, num: d.end, col: WHITE, icon: !usd },
     ];
     let ry = 430;
     for (const r of rows) {

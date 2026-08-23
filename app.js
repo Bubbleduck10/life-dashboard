@@ -404,6 +404,28 @@ function setMoneyStat(id, val) {
 }
 
 /* ============ Assets ============ */
+// curated ticker → CoinGecko id so popular coins resolve reliably
+// (some tickers like HYPE are shared by several tokens)
+const KNOWN_CRYPTO = {
+  HYPE: { id: "hyperliquid", name: "Hyperliquid" },
+  SOL: { id: "solana", name: "Solana" },
+  BTC: { id: "bitcoin", name: "Bitcoin" },
+  ETH: { id: "ethereum", name: "Ethereum" },
+  BNB: { id: "binancecoin", name: "BNB" },
+  XRP: { id: "ripple", name: "XRP" },
+  USDC: { id: "usd-coin", name: "USD Coin" },
+  USDT: { id: "tether", name: "Tether" },
+  DOGE: { id: "dogecoin", name: "Dogecoin" },
+  ADA: { id: "cardano", name: "Cardano" },
+  AVAX: { id: "avalanche-2", name: "Avalanche" },
+  LINK: { id: "chainlink", name: "Chainlink" },
+  SUI: { id: "sui", name: "Sui" },
+  JUP: { id: "jupiter-exchange-solana", name: "Jupiter" },
+  WIF: { id: "dogwifcoin", name: "dogwifhat" },
+  BONK: { id: "bonk", name: "Bonk" },
+  PEPE: { id: "pepe", name: "Pepe" },
+};
+
 const assetForm = document.getElementById("asset-form");
 assetForm.addEventListener("submit", async e => {
   e.preventDefault();
@@ -416,15 +438,21 @@ assetForm.addEventListener("submit", async e => {
   const asset = { id: uid(), kind, symbol, name: symbol, cgId: null, qty, buyPrice, manualPrice: null };
 
   if (kind === "crypto") {
-    setStatus("asset-status", `Looking up ${symbol} on CoinGecko…`);
-    try {
-      const res = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(symbol)}`);
-      const data = await res.json();
-      const hit = (data.coins || []).find(c => c.symbol.toUpperCase() === symbol) || (data.coins || [])[0];
-      if (hit) { asset.cgId = hit.id; asset.name = hit.name; }
-      else setStatus("asset-status", `Couldn't find "${symbol}" on CoinGecko — you can set a manual price in the table.`);
-    } catch {
-      setStatus("asset-status", "CoinGecko lookup failed (offline?). Added with manual pricing.");
+    if (KNOWN_CRYPTO[symbol]) {
+      // curated match — skip the ambiguous search
+      asset.cgId = KNOWN_CRYPTO[symbol].id;
+      asset.name = KNOWN_CRYPTO[symbol].name;
+    } else {
+      setStatus("asset-status", `Looking up ${symbol} on CoinGecko…`);
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(symbol)}`);
+        const data = await res.json();
+        const hit = (data.coins || []).find(c => c.symbol.toUpperCase() === symbol) || (data.coins || [])[0];
+        if (hit) { asset.cgId = hit.id; asset.name = hit.name; }
+        else setStatus("asset-status", `Couldn't find "${symbol}" on CoinGecko — you can set a manual price in the table.`);
+      } catch {
+        setStatus("asset-status", "CoinGecko lookup failed (offline?). Added with manual pricing.");
+      }
     }
   }
 

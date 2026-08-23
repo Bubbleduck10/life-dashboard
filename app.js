@@ -56,6 +56,7 @@ const COINS = {
   ETH:  { cgId: "ethereum", cb: "ETH-USD" },
   BTC:  { cgId: "bitcoin",  cb: "BTC-USD" },
   BNB:  { cgId: "binancecoin" }, // no Coinbase pair — historical prices via CoinGecko
+  HYPE: { cgId: "hyperliquid" }, // Hyperliquid — CoinGecko for live + historical
 };
 
 function livePrice(coin) {

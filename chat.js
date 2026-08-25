@@ -18,7 +18,11 @@ const CHAT_INTENTS = [
     answer: "Click the <strong>✎ pencil</strong> on any day in the Money table to edit its <strong>starting and ending balance</strong> — handy when your day isn't finished and the balance is still moving. Profit and USD recalculate instantly. Use 📝 to edit that day's note."
   },
   {
-    keywords: ["swap", "swaps", "swapped", "stables", "sold sol", "bought sol"],
+    keywords: ["stable", "stables", "secured", "cash out", "cashed out", "off the table", "usdc balance", "savings", "stabling"],
+    answer: "The <strong>🏦 Stables</strong> panel on the Money tab is a secured-funds ledger. Log money you <strong>move into stablecoins</strong> (+) or <strong>take back out</strong> (−) with a date and note; it shows your current stabled balance, a running balance per entry, and how much you secured this month. It syncs across your devices."
+  },
+  {
+    keywords: ["swap", "swaps", "swapped", "sold sol", "bought sol"],
     answer: "The <strong>SOL swaps</strong> panel on the Money tab logs SOL you bought or sold: date, # SOL, and $ total — the price per SOL is computed for you. Swaps show for the month you're viewing, with a month total and an all-time summary (total swapped and average price) in the header."
   },
   {

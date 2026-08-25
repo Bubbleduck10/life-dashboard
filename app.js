@@ -16,6 +16,7 @@ const store = {
 
 let trades = store.load("life.trades", []);  // {id, date, startSol, endSol}
 let swaps  = store.load("life.swaps", []);   // {id, date, sol, usd}
+let stables = store.load("life.stables", []); // {id, date, amount, type:'in'|'out', note}
 let assets = store.load("life.assets", []);  // {id, kind, symbol, name, cgId, qty, buyPrice, manualPrice}
 let food   = store.load("life.food", []);    // {id, date, name, kcal, servings}
 let goals  = store.load("life.goals", []);   // {id, title, target, current, unit}
@@ -216,6 +217,60 @@ document.getElementById("swap-form").addEventListener("submit", e => {
   viewMonth = date.slice(0, 7); // show the month the swap landed in
   renderMoney();
 });
+
+/* ----- Stables: secured-funds ledger ----- */
+document.getElementById("stable-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const date = document.getElementById("stable-date").value || todayStr();
+  const type = document.getElementById("stable-type").value;
+  const amount = parseFloat(document.getElementById("stable-amount").value);
+  const note = document.getElementById("stable-note").value.trim();
+  if (!isFinite(amount) || amount <= 0) return;
+  stables.push({ id: uid(), date, amount, type, note });
+  store.save("life.stables", stables);
+  e.target.reset();
+  document.getElementById("stable-date").value = todayStr();
+  renderStables();
+});
+
+function stableBalance() {
+  return stables.reduce((s, x) => s + (x.type === "in" ? x.amount : -x.amount), 0);
+}
+
+function renderStables() {
+  const bal = stableBalance();
+  const balEl = document.getElementById("stable-balance");
+  balEl.textContent = fmtMoney(bal);
+  balEl.className = bal > 0 ? "up" : bal < 0 ? "down" : "muted";
+
+  const mPrefix = todayStr().slice(0, 7);
+  const mNet = stables.filter(x => x.date.startsWith(mPrefix))
+    .reduce((s, x) => s + (x.type === "in" ? x.amount : -x.amount), 0);
+  document.getElementById("stable-month").textContent =
+    stables.length ? `${mNet >= 0 ? "+" : ""}${fmtMoney(mNet)} secured this month` : "money moved to stablecoins";
+
+  // running balance computed oldest → newest, displayed newest first
+  const ordered = [...stables].sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+  let run = 0;
+  const withBal = ordered.map(x => { run += x.type === "in" ? x.amount : -x.amount; return { ...x, bal: run }; });
+  const rows = withBal.reverse();
+
+  const tbody = document.getElementById("stable-rows");
+  tbody.innerHTML = rows.length ? rows.map(x => `
+    <tr>
+      <td>${esc(x.date)}</td>
+      <td>${x.note ? esc(x.note) : "<span class='muted'>—</span>"}</td>
+      <td class="num ${x.type === "in" ? "up" : "down"}">${x.type === "in" ? "+" : "−"}${fmtMoney(x.amount).replace("-", "")}</td>
+      <td class="num">${fmtMoney(x.bal)}</td>
+      <td class="num"><button class="del" data-id="${x.id}" title="Delete">✕</button></td>
+    </tr>`).join("")
+    : `<tr><td colspan="5" class="empty">No stables logged — record money you move into stablecoins.</td></tr>`;
+  tbody.querySelectorAll(".del").forEach(b => b.addEventListener("click", () => {
+    stables = stables.filter(x => x.id !== b.dataset.id);
+    store.save("life.stables", stables);
+    renderStables();
+  }));
+}
 
 function sumTrades(list) {
   const coins = {};
@@ -1097,9 +1152,11 @@ function renderDashboard() {
 document.getElementById("today-date").textContent = new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 document.getElementById("trade-date").value = todayStr();
 document.getElementById("swap-date").value = todayStr();
+document.getElementById("stable-date").value = todayStr();
 ensureSolPrice();
 ensureSolHistory();
 renderMoney();
+renderStables();
 renderAssets();
 renderFood();
 renderGoals();

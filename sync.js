@@ -3,7 +3,7 @@
 // GitHub account. Strategy: pull on load, debounced push on every change,
 // last-write-wins by timestamp. Token (classic, gist scope) stays in localStorage.
 
-const SYNC_KEYS = ["life.trades", "life.swaps", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share", "life.habits", "life.habitLog", "life.peptides", "life.peptideLog"];
+const SYNC_KEYS = ["life.trades", "life.swaps", "life.stables", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share", "life.habits", "life.habitLog", "life.peptides", "life.peptideLog"];
 const GIST_FILE = "life-dashboard-data.json";
 const GH_API = "https://api.github.com";
 
@@ -41,6 +41,7 @@ function applyRemote(envelope) {
   // reload in-memory state from storage and re-render everything
   trades = store.load("life.trades", []);
   swaps = store.load("life.swaps", []);
+  stables = store.load("life.stables", []);
   assets = store.load("life.assets", []);
   food = store.load("life.food", []);
   goals = store.load("life.goals", []);
@@ -51,7 +52,7 @@ function applyRemote(envelope) {
   habitLog = store.load("life.habitLog", {});
   peptides = store.load("life.peptides", []);
   peptideLog = store.load("life.peptideLog", {});
-  renderMoney(); renderAssets(); renderFood(); renderGoals(); renderTodos(); renderHabits(); renderPeptides(); renderDashboard();
+  renderMoney(); renderStables(); renderAssets(); renderFood(); renderGoals(); renderTodos(); renderHabits(); renderPeptides(); renderDashboard();
   renderRestaurantSelect();
   ensureSolHistory(); // imported/synced trades may need historical prices
 }

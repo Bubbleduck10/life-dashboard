@@ -44,6 +44,7 @@ document.querySelectorAll("nav button").forEach(btn => {
 
 /* ============ Money: daily SOL profit tracking ============ */
 let viewMonth = todayStr().slice(0, 7); // which month the daily log table shows
+const expandedDays = new Set(); // multi-currency days expanded in the daily log
 
 const tradeProfit = t => t.endSol - t.startSol;
 const tradeCoin = t => t.coin || "SOL";
@@ -363,9 +364,13 @@ function renderMoney() {
   document.getElementById("month-swapped").textContent = monthSwaps.length
     ? `swapped: ${msSol.toLocaleString(undefined, { maximumFractionDigits: 2 })} SOL ↔ ${fmtMoney(msUsd)}` : "";
 
-  const rows = trades.filter(x => x.date.startsWith(viewMonth)).sort((a, b) => b.date.localeCompare(a.date));
-  const tbody = document.getElementById("trade-rows");
-  tbody.innerHTML = rows.length ? rows.map(x => {
+  const monthTrades = trades.filter(x => x.date.startsWith(viewMonth));
+  const byDate = {};
+  for (const x of monthTrades) (byDate[x.date] = byDate[x.date] || []).push(x);
+  const dates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+
+  // one trade (currency) rendered as a full row; isSub indents it under a day summary
+  const rowHtml = (x, isSub) => {
     const pSol = tradeProfit(x);
     const coin = tradeCoin(x);
     const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
@@ -374,9 +379,12 @@ function renderMoney() {
     const priceNote = dayPrice != null
       ? (x.date === todayStr() || (coinHist[coin] || {})[x.date] == null ? `live price ${fmtPrice(dayPrice)}` : `${coin} ${fmtPrice(dayPrice)} on ${x.date}`)
       : "";
+    const dayCell = isSub
+      ? `<span class="muted" style="padding-left:18px">↳ ${coin}</span>`
+      : `${esc(x.date)}${coin !== "SOL" ? ` <span class="muted" style="font-size:11px">${coin}</span>` : ""}`;
     return `
-    <tr>
-      <td>${esc(x.date)}${coin !== "SOL" ? ` <span class="muted" style="font-size:11px">${coin}</span>` : ""}</td>
+    <tr${isSub ? ' class="sub-row"' : ""}>
+      <td>${dayCell}</td>
       <td class="num">${x.startSol}</td>
       <td class="num">${x.endSol}</td>
       <td class="num ${cls}">${fmtAmt(pSol, coin)}</td>
@@ -388,7 +396,36 @@ function renderMoney() {
       </td>
     </tr>
     ${x.note ? `<tr class="note-row"><td colspan="6">📝 ${esc(x.note)}</td></tr>` : ""}`;
-  }).join("") + (rows.length > 1 ? `
+  };
+
+  let bodyHtml = "";
+  for (const date of dates) {
+    const entries = byDate[date];
+    if (entries.length === 1) { bodyHtml += rowHtml(entries[0], false); continue; }
+    // multi-currency day → one collapsible summary row
+    const coins = dayCoins(date);
+    const usdSum = dayNetUsd(date);
+    const anyUsd = entries.some(t => usdForTrade(t) != null);
+    const solSign = Object.values(coins).reduce((s, v) => s + v, 0);
+    const sign = usdSum || solSign;
+    const cls = sign > 0 ? "p-pos" : sign < 0 ? "p-neg" : "";
+    const expanded = expandedDays.has(date);
+    bodyHtml += `
+    <tr class="day-summary" data-day="${date}" style="cursor:pointer">
+      <td>${esc(date)} <span class="muted" style="font-size:11px">${entries.length} coins ${expanded ? "▾" : "▸"}</span></td>
+      <td class="num muted" colspan="2" style="text-align:right;font-size:12px">${expanded ? "tap to collapse" : "tap to expand"}</td>
+      <td class="num ${cls}">${fmtCoins(coins)}</td>
+      <td class="num ${cls}">${anyUsd ? fmtMoney(usdSum) : "—"}</td>
+      <td></td>
+    </tr>`;
+    if (expanded) {
+      for (const t of [...entries].sort((a, b) => tradeCoin(a).localeCompare(tradeCoin(b)))) bodyHtml += rowHtml(t, true);
+    }
+  }
+
+  const tbody = document.getElementById("trade-rows");
+  tbody.innerHTML = monthTrades.length
+    ? bodyHtml + (monthTrades.length > 1 ? `
     <tr class="totals">
       <td colspan="3">Month total</td>
       <td class="num ${vtSign > 0 ? "up" : vtSign < 0 ? "down" : ""}">${fmtCoins(vt.coins)}</td>
@@ -396,6 +433,12 @@ function renderMoney() {
       <td></td>
     </tr>` : "")
     : `<tr><td colspan="6" class="empty">No trading days logged for this month.</td></tr>`;
+
+  tbody.querySelectorAll(".day-summary").forEach(r => r.addEventListener("click", () => {
+    const d = r.dataset.day;
+    if (expandedDays.has(d)) expandedDays.delete(d); else expandedDays.add(d);
+    renderMoney();
+  }));
   tbody.querySelectorAll(".del").forEach(b => b.addEventListener("click", () => {
     const tr = trades.find(x => x.id === b.dataset.id);
     if (!tr) return;

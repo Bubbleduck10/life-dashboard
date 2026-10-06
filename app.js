@@ -1158,18 +1158,30 @@ function renderDashboard() {
   renderGoalList(document.getElementById("money-goal-list"), true);
 
   // daily profits: today's entries (one row per currency)
-  document.getElementById("dash-profit-rows").innerHTML = todaysTrades.length
-    ? todaysTrades.map(x => {
-        const pSol = tradeProfit(x);
-        const usd = usdForTrade(x);
-        const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
-        return `<tr>
+  const dpBody = document.getElementById("dash-profit-rows");
+  if (!todaysTrades.length) {
+    dpBody.innerHTML = `<tr><td colspan="3" class="empty">No entry for today yet — log it on the Money tab.</td></tr>`;
+  } else if (todaysTrades.length === 1) {
+    const x = todaysTrades[0];
+    const pSol = tradeProfit(x), usd = usdForTrade(x);
+    const cls = pSol > 0 ? "p-pos" : pSol < 0 ? "p-neg" : "";
+    dpBody.innerHTML = `<tr>
       <td>Today <span class="muted">(${tradeCoin(x)}: ${x.startSol} → ${x.endSol})</span></td>
       <td class="num ${cls}">${fmtAmt(pSol, tradeCoin(x))}</td>
       <td class="num ${cls}">${usd != null ? fmtMoney(usd) : "—"}</td>
     </tr>`;
-      }).join("")
-    : `<tr><td colspan="3" class="empty">No entry for today yet — log it on the Money tab.</td></tr>`;
+  } else {
+    // multiple currencies today → one combined row
+    const coins = dayCoins(t), usdSum = dayNetUsd(t);
+    const anyUsd = todaysTrades.some(x => usdForTrade(x) != null);
+    const sign = usdSum || Object.values(coins).reduce((s, v) => s + v, 0);
+    const cls = sign > 0 ? "p-pos" : sign < 0 ? "p-neg" : "";
+    dpBody.innerHTML = `<tr>
+      <td>Today <span class="muted">(${todaysTrades.length} coins)</span></td>
+      <td class="num ${cls}">${fmtCoins(coins)}</td>
+      <td class="num ${cls}">${anyUsd ? fmtMoney(usdSum) : "—"}</td>
+    </tr>`;
+  }
 
   // daily food progress
   const todaysFood = food.filter(f => f.date === t);

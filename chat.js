@@ -62,6 +62,10 @@ const CHAT_INTENTS = [
     answer: "The <strong>💉 Peptides</strong> tab is a personal dose reminder. Add each peptide with its dose, unit, how often (daily / specific days / every N days), and the time(s) of day. It shows today's schedule with a <strong>Mark taken</strong> button, your next dose, and a Peptides-today panel on the Overview. Turn on <strong>🔔 reminders</strong> to get a browser nudge at each dose time (while the app is open). It's a tracker, not medical advice — follow your provider's protocol."
   },
   {
+    keywords: ["callout", "callouts", "call out", "pump.fun", "pumpfun", "pump fun", "caller", "callout rewards", "usdc payout"],
+    answer: "The <strong>📣 Callouts</strong> tab tracks your pump.fun Callout Rewards. Paste the coin's CA or pump.fun link when you make a call — the <strong>market cap at call</strong> and the coin's <strong>1h / 4h price move</strong> fill in automatically (you can log a call after the fact too). Each day, enter the USDC you received for that day's calls. Optionally copy the 1h/4h follower PnL from pump.fun into the table. The tab splits each day's payout across that day's calls and shows your average per call and the <strong>best-paying market-cap range</strong>."
+  },
+  {
     keywords: ["habit", "habits", "daily habit", "gym", "water", "routine", "streak habit", "recurring"],
     answer: "The <strong>✅ Daily Habits</strong> popup tracks simple recurring things — Gym, Water, Clean, Read… It pops up once a day so you can check them off; they reset each morning and each habit builds a 🔥 streak. Add your own or tap a suggestion. Open it anytime from the <strong>Daily habits</strong> panel on the Overview (the Open button). Checking habits earns XP, and a 7-day streak unlocks the Habit Hero badge."
   },

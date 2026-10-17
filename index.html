@@ -26,6 +26,7 @@
     <button data-tab="food">🍎 Food</button>
     <button data-tab="goals">🎯 Goals</button>
     <button data-tab="peptides">💉 Peptides</button>
+    <button data-tab="callouts">📣 Callouts</button>
     <button data-tab="arcade">🏆 Arcade</button>
     <button data-tab="sync">☁ Sync</button>
   </nav>
@@ -437,6 +438,51 @@
     </div>
   </section>
 
+  <!-- ============ CALLOUTS ============ -->
+  <section class="tab" id="tab-callouts">
+    <div class="grid">
+      <div class="card"><h3>Callout rewards earned</h3><div class="big" id="co-total">—</div><div class="sub" id="co-total-sub"></div></div>
+      <div class="card"><h3>Calls logged</h3><div class="big" id="co-count">—</div><div class="sub" id="co-count-sub"></div></div>
+      <div class="card"><h3>Avg payout per call</h3><div class="big" id="co-avg">—</div><div class="sub" id="co-avg-sub"></div></div>
+      <div class="card"><h3>Best-paying MC range</h3><div class="big" id="co-best">—</div><div class="sub" id="co-best-sub"></div></div>
+    </div>
+
+    <div class="panel">
+      <h2>Log a call</h2>
+      <form id="co-form" class="row">
+        <label class="field" style="flex:1;min-width:220px">Coin (mint or pump.fun link)<input id="co-mint" placeholder="paste the CA or pump.fun/coin/… link" required autocomplete="off"></label>
+        <label class="field">Called at<input id="co-time" type="datetime-local"></label>
+        <label class="field co-check"><input id="co-held" type="checkbox" checked> I'm holding it</label>
+        <button class="btn" type="submit">Log call</button>
+      </form>
+      <div class="statusmsg" id="co-status" style="margin-top:8px"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Daily payout</h2>
+      <form id="co-pay-form" class="row">
+        <label class="field">For calls made on<input id="co-pay-date" type="date" required></label>
+        <label class="field">USDC received<input id="co-pay-amt" type="number" step="any" min="0" placeholder="e.g. 12.40" required style="width:130px"></label>
+        <button class="btn" type="submit">Save payout</button>
+      </form>
+      <div id="co-pay-list" style="margin-top:12px"></div>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2 style="margin:0">Calls</h2>
+        <button class="btn small ghost" id="co-refresh" type="button">↻ Update prices</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Called</th><th>Coin</th><th class="num">MC at call</th><th class="num">Price 1h</th><th class="num">Price 4h</th><th class="num">Followers 1h</th><th class="num">Followers 4h</th><th>Held</th><th class="num">Payout share</th><th></th></tr></thead>
+          <tbody id="co-rows"></tbody>
+        </table>
+      </div>
+      <p class="muted" style="margin-top:10px">Market cap and price moves fill in automatically (DexScreener + GeckoTerminal). Copy the 1h/4h follower PnL from the pump.fun Callouts page into the two input columns.</p>
+    </div>
+  </section>
+
   <!-- ============ ARCADE ============ -->
   <section class="tab" id="tab-arcade">
     <div class="panel">
@@ -694,6 +740,7 @@
 <script src="app.js"></script>
 <script src="habits.js"></script>
 <script src="peptides.js"></script>
+<script src="callouts.js"></script>
 <script src="game.js"></script>
 <script src="calendar.js"></script>
 <script src="share.js"></script>

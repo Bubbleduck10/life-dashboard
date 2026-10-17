@@ -908,3 +908,10 @@ tr.note-row td {
   .card .big { font-size: 22px; }
   th, td { padding: 8px 5px; font-size: 13px; }
 }
+
+/* ============ Callouts ============ */
+.table-wrap { overflow-x: auto; }
+label.field.co-check { flex-direction: row; align-items: center; gap: 6px; align-self: flex-end; padding-bottom: 10px; }
+.co-in { width: 72px; text-align: right; padding: 5px 6px; }
+#tab-callouts td a { color: var(--accent); text-decoration: none; }
+#tab-callouts td a:hover { text-decoration: underline; }

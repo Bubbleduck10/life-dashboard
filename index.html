@@ -22,6 +22,7 @@
   <nav>
     <button data-tab="dash" class="active">Overview</button>
     <button data-tab="money">💵 Money</button>
+    <button data-tab="bets">🎰 Bets</button>
     <button data-tab="assets">📈 Assets</button>
     <button data-tab="food">🍎 Food</button>
     <button data-tab="goals">🎯 Goals</button>
@@ -224,6 +225,80 @@
     <div class="panel">
       <h2>Goals</h2>
       <div id="money-goal-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ SPORTS BETS ============ -->
+  <section class="tab" id="tab-bets">
+    <div class="grid">
+      <div class="card"><h3>Net profit</h3><div class="big" id="bet-net">$0.00</div><div class="sub" id="bet-net-sub">from settled bets</div></div>
+      <div class="card"><h3>Record</h3><div class="big" id="bet-record">0-0</div><div class="sub" id="bet-record-sub">win rate —</div></div>
+      <div class="card"><h3>Total staked / won</h3><div class="big" id="bet-staked">$0</div><div class="sub" id="bet-staked-sub"></div></div>
+    </div>
+
+    <div class="panel">
+      <h2>🎟️ Bet slip card maker <span class="muted" style="font-weight:400;font-size:13px">— drag in your slips, it totals the wins</span></h2>
+      <div id="bet-drop" class="bet-drop">
+        <input id="bet-file" type="file" accept="image/*" multiple style="display:none">
+        <div class="bet-drop-inner">📥 Drag &amp; drop bet slip images here, or <span class="bet-browse">browse</span></div>
+      </div>
+      <div id="bet-slips" class="bet-slips"></div>
+      <div class="field" style="margin-top:12px">Anime background
+        <div class="bet-bg-picker" id="bet-bg-picker"></div>
+        <label class="btn small ghost" style="cursor:pointer;margin-top:8px;display:inline-block">🖼️ Upload my own
+          <input id="bet-bg-upload" type="file" accept="image/*" style="display:none">
+        </label>
+      </div>
+      <div class="row" style="gap:10px;margin-top:12px;align-items:flex-end">
+        <label class="field">Title
+          <input id="bet-title" placeholder="TODAY'S SLIPS" value="TODAY'S SLIPS" style="width:180px">
+        </label>
+        <label class="field">Your @
+          <input id="bet-handle" placeholder="@you" style="width:140px">
+        </label>
+        <span style="flex:1"></span>
+        <div style="text-align:right">
+          <div class="muted" style="font-size:12px">Total won</div>
+          <div id="bet-total" class="big up" style="font-size:24px">$0.00</div>
+        </div>
+      </div>
+      <div class="row" style="gap:8px;margin-top:10px">
+        <button class="btn" id="bet-card-save" type="button">⬇ Save card (PNG)</button>
+        <button class="btn ghost" id="bet-log-from-card" type="button">＋ Also log these to my bet history</button>
+      </div>
+      <p class="statusmsg" id="bet-card-status" style="margin-top:8px"></p>
+      <canvas id="bet-canvas" style="display:none"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>📒 Bet history <span class="muted" id="bet-month-label" style="font-weight:400;font-size:13px"></span></h2>
+      <form class="row" id="bet-form">
+        <label class="field">Date
+          <input id="bet-date" type="date" required>
+        </label>
+        <label class="field" style="flex:1;min-width:140px">Bet
+          <input id="bet-event" placeholder="e.g. Lakers ML, 3-leg parlay…" required>
+        </label>
+        <label class="field">Stake ($)
+          <input id="bet-stake" type="number" step="0.01" min="0" style="width:100px" required>
+        </label>
+        <label class="field">Result
+          <select id="bet-result">
+            <option value="pending">Pending</option>
+            <option value="won">Won</option>
+            <option value="lost">Lost</option>
+          </select>
+        </label>
+        <label class="field">Payout ($)
+          <input id="bet-payout" type="number" step="0.01" min="0" style="width:110px" placeholder="if won">
+        </label>
+        <button class="btn" type="submit">Add</button>
+      </form>
+      <table>
+        <thead><tr><th>Date</th><th>Bet</th><th class="num">Stake</th><th>Result</th><th class="num">Profit</th><th></th></tr></thead>
+        <tbody id="bet-rows"></tbody>
+      </table>
+      <p class="muted" style="margin-top:8px;font-size:12px">Separate from your trading money — this is just your betting record. Mark a pending bet Won/Lost with the ✎ button when it settles.</p>
     </div>
   </section>
 
@@ -741,6 +816,7 @@
 <script src="habits.js"></script>
 <script src="peptides.js"></script>
 <script src="callouts.js"></script>
+<script src="bets.js"></script>
 <script src="game.js"></script>
 <script src="calendar.js"></script>
 <script src="share.js"></script>

@@ -312,6 +312,34 @@ td.num, th.num { text-align: right; }
 .share-swatch.on { border-color: var(--text); }
 @media (max-width: 720px) { .share-controls { width: 100%; } }
 
+/* sports bets */
+.bet-drop {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 26px;
+  text-align: center;
+  cursor: pointer;
+  color: var(--muted);
+  transition: border-color .15s, background .15s;
+}
+.bet-drop:hover, .bet-drop.over { border-color: var(--accent); background: rgba(79, 140, 255, .07); color: var(--text); }
+.bet-browse { color: var(--accent); font-weight: 600; }
+
+.bet-slips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.bet-slip { position: relative; width: 120px; }
+.bet-slip img { width: 120px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); display: block; }
+.bet-slip-win { display: flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 13px; color: var(--muted); }
+.bet-slip-win input { width: 100%; padding: 4px 6px; font-size: 13px; }
+.bet-slip-del { position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, .6); border-radius: 6px; }
+
+.bet-bg-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.bet-scene {
+  width: 56px; height: 70px; border-radius: 8px; cursor: pointer;
+  border: 2px solid transparent; transition: transform .12s;
+}
+.bet-scene:hover { transform: scale(1.06); }
+.bet-scene.on { border-color: var(--text); }
+
 /* peptides */
 .pep-days { display: flex; gap: 5px; margin-top: 5px; }
 .pep-day {

@@ -18,6 +18,10 @@ const CHAT_INTENTS = [
     answer: "Click the <strong>✎ pencil</strong> on any day in the Money table to edit its <strong>starting and ending balance</strong> — handy when your day isn't finished and the balance is still moving. Profit and USD recalculate instantly. Use 📝 to edit that day's note."
   },
   {
+    keywords: ["bet", "bets", "betting", "sports bet", "parlay", "slip", "sportsbook", "wager", "gamble"],
+    answer: "The <strong>🎰 Bets</strong> tab is for sports betting, totally separate from your trading money. <strong>Bet slip card maker</strong>: drag your bet-slip screenshots in, type what each won, pick an anime background (ocean, forest, sunset, night, sakura — or upload your own), and Save a PNG card showing the slips + total won. <strong>Bet history</strong>: log each bet's stake/result/payout for your record, profit, and win rate. Slip images stay on your device; your bet history syncs."
+  },
+  {
     keywords: ["stable", "stables", "secured", "cash out", "cashed out", "off the table", "usdc balance", "savings", "stabling"],
     answer: "The <strong>🏦 Stables</strong> panel on the Money tab is a secured-funds ledger. Log money you <strong>move into stablecoins</strong> (+) or <strong>take back out</strong> (−) with a date and note; it shows your current stabled balance, a running balance per entry, and how much you secured this month. It syncs across your devices."
   },

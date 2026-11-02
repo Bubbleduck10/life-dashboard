@@ -6,7 +6,7 @@ $listener.Prefixes.Add("http://localhost:$port/")
 $listener.IgnoreWriteExceptions = $true
 $listener.Start()
 Write-Host "Serving $root at http://localhost:$port/"
-$mime = @{ ".html"="text/html"; ".css"="text/css"; ".js"="application/javascript"; ".json"="application/json"; ".png"="image/png"; ".svg"="image/svg+xml"; ".ico"="image/x-icon" }
+$mime = @{ ".html"="text/html"; ".css"="text/css"; ".js"="application/javascript"; ".json"="application/json"; ".png"="image/png"; ".svg"="image/svg+xml"; ".ico"="image/x-icon"; ".webp"="image/webp"; ".jpg"="image/jpeg"; ".jpeg"="image/jpeg" }
 while ($listener.IsListening) {
   try {
     $ctx = $listener.GetContext()

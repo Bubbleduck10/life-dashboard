@@ -233,16 +233,15 @@ function drawBetCard() {
       const c = i % cols, r = Math.floor(i / cols);
       const x = pad + c * (cellW + gap);
       const y = gridTop + r * (cellH + gap);
-      // image cover into cell (leaving a strip for the win caption)
+      // fit the WHOLE slip into the cell (no cropping), on a backing panel
       const imgH = cellH - 46;
       const img = s.img;
-      const scale = Math.max(cellW / img.naturalWidth, imgH / img.naturalHeight);
+      roundRectPath(ctx, x, y, cellW, imgH, 14);
+      ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.fill();
+      const scale = Math.min(cellW / img.naturalWidth, imgH / img.naturalHeight) * 0.96;
       const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
-      ctx.save();
-      roundRectPath(ctx, x, y, cellW, imgH, 14); ctx.clip();
       ctx.drawImage(img, x + (cellW - dw) / 2, y + (imgH - dh) / 2, dw, dh);
-      ctx.restore();
-      ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,0.3)";
       roundRectPath(ctx, x, y, cellW, imgH, 14); ctx.stroke();
       // win caption
       ctx.textAlign = "center"; shadow();

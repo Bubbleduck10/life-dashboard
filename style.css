@@ -327,7 +327,7 @@ td.num, th.num { text-align: right; }
 
 .bet-slips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
 .bet-slip { position: relative; width: 120px; }
-.bet-slip img { width: 120px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); display: block; }
+.bet-slip img { width: 120px; height: 150px; object-fit: contain; background: rgba(0, 0, 0, .3); border-radius: 8px; border: 1px solid var(--border); display: block; }
 .bet-slip-win { display: flex; align-items: center; gap: 4px; margin-top: 5px; font-size: 13px; color: var(--muted); }
 .bet-slip-win input { width: 100%; padding: 4px 6px; font-size: 13px; }
 .bet-slip-del { position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, .6); border-radius: 6px; }

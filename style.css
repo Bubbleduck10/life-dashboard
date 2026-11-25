@@ -312,6 +312,27 @@ td.num, th.num { text-align: right; }
 .share-swatch.on { border-color: var(--text); }
 @media (max-width: 720px) { .share-controls { width: 100%; } }
 
+/* hourly planner */
+.planner { max-height: 340px; overflow-y: auto; position: relative; }
+.planner-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 4px 6px; border-radius: 8px;
+}
+.planner-row + .planner-row { margin-top: 2px; }
+.planner-time {
+  width: 58px; flex-shrink: 0; text-align: right;
+  font-size: 12px; font-weight: 600; color: var(--muted);
+}
+.planner-row input {
+  flex: 1; background: transparent; border: none;
+  border-bottom: 1px solid var(--border); border-radius: 0;
+  padding: 7px 4px; font-size: 14px; color: var(--text);
+}
+.planner-row input:focus { outline: none; border-bottom-color: var(--accent); box-shadow: none; }
+.planner-row.now { background: rgba(79, 140, 255, .1); }
+.planner-row.now .planner-time { color: var(--accent); }
+.planner-row.now input { border-bottom-color: rgba(79, 140, 255, .5); }
+
 /* sports bets */
 .bet-drop {
   border: 2px dashed var(--border);

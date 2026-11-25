@@ -69,6 +69,15 @@
       </form>
     </aside>
     </div>
+    <div class="panel">
+      <h2><span>🕐 Hourly planner</span>
+        <span style="display:flex;gap:10px;align-items:center">
+          <span class="muted" id="planner-date" style="font-size:12px;font-weight:400"></span>
+          <button class="btn small ghost" id="planner-clear" type="button">Clear day</button>
+        </span>
+      </h2>
+      <div class="planner" id="planner-rows"></div>
+    </div>
     <div class="cols">
       <div class="panel">
         <h2><span>💵 Daily profits</span><span class="muted" style="font-size:12px;font-weight:400">today</span></h2>
@@ -817,6 +826,7 @@
 <script src="peptides.js"></script>
 <script src="callouts.js"></script>
 <script src="bets.js"></script>
+<script src="planner.js"></script>
 <script src="game.js"></script>
 <script src="calendar.js"></script>
 <script src="share.js"></script>

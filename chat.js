@@ -74,6 +74,10 @@ const CHAT_INTENTS = [
     answer: "The <strong>✅ Daily Habits</strong> popup tracks simple recurring things — Gym, Water, Clean, Read… It pops up once a day so you can check them off; they reset each morning and each habit builds a 🔥 streak. Add your own or tap a suggestion. Open it anytime from the <strong>Daily habits</strong> panel on the Overview (the Open button). Checking habits earns XP, and a 7-day streak unlocks the Habit Hero badge."
   },
   {
+    keywords: ["planner", "hourly", "schedule", "plan my day", "hour by hour", "time block", "timetable", "agenda"],
+    answer: "The <strong>🕐 Hourly planner</strong> on the Overview lets you plan each hour of the day — type what you're doing next to any hour. The current hour is highlighted and the panel scrolls to it; everything saves per day (each day starts fresh) and syncs across your devices. Use <strong>Clear day</strong> to wipe today's plan."
+  },
+  {
     keywords: ["todo", "to-do", "to do", "task", "tasks", "checklist", "pinned note", "paper note"],
     answer: "The <strong>📝 Daily to-do list</strong> lives at the top of the Goals tab — add tasks, check them off, ✕ to remove. It's also pinned to your Overview as the paper note on the right: click a line to check it off, or type in the note to add a task. Finished tasks clear overnight; unfinished ones carry over to today."
   },

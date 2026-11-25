@@ -3,7 +3,7 @@
 // GitHub account. Strategy: pull on load, debounced push on every change,
 // last-write-wins by timestamp. Token (classic, gist scope) stays in localStorage.
 
-const SYNC_KEYS = ["life.trades", "life.swaps", "life.stables", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share", "life.habits", "life.habitLog", "life.peptides", "life.peptideLog", "life.callouts", "life.calloutPay", "life.bets"];
+const SYNC_KEYS = ["life.trades", "life.swaps", "life.stables", "life.assets", "life.food", "life.goals", "life.settings", "life.restaurants", "life.todos", "life.share", "life.habits", "life.habitLog", "life.peptides", "life.peptideLog", "life.callouts", "life.calloutPay", "life.bets", "life.planner"];
 const GIST_FILE = "life-dashboard-data.json";
 const GH_API = "https://api.github.com";
 
@@ -55,7 +55,8 @@ function applyRemote(envelope) {
   callouts = store.load("life.callouts", []);
   calloutPay = store.load("life.calloutPay", {});
   bets = store.load("life.bets", []);
-  renderMoney(); renderStables(); renderAssets(); renderFood(); renderGoals(); renderTodos(); renderHabits(); renderPeptides(); renderCallouts(); renderBets(); renderDashboard();
+  planner = store.load("life.planner", {});
+  renderMoney(); renderStables(); renderAssets(); renderFood(); renderGoals(); renderTodos(); renderHabits(); renderPeptides(); renderCallouts(); renderBets(); renderPlanner(); renderDashboard();
   renderRestaurantSelect();
   ensureSolHistory(); // imported/synced trades may need historical prices
 }
